@@ -52,3 +52,4 @@ This report certifies that all audio assets, 3D meshes, texture maps, shaders, c
 ## 5. Certification of Originality
 
 All code, scripts, configurations, ScriptableObjects, and asset architectures in `Assets/Game/` have been originally authored for Indian Bike Life under standard proprietary software licensing. No unlicensed proprietary assets from third-party games were incorporated.
+

@@ -28,3 +28,4 @@
     <type fullname="System.Security.Cryptography.SHA256CryptoServiceProvider" preserve="all" />
   </assembly>
 </linker>
+

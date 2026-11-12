@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bbf3f07be807e3bc57b295c25ba47ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 01d7bf2afb9772ec3cd4dd509598042e, type: 3}
   m_Name: RidingModeCatalogue
   _modes:
   - {fileID: 11400000, guid: ed36374417ea5eeb64fe6d6dab9c6d77, type: 2}

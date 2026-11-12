@@ -75,3 +75,4 @@ As mandated by release engineering protocols, the above benchmarks reflect:
 3. **Target Device Testing:** Physical reference targets benchmarked using Snapdragon Profiler and Android GPU Inspector on retail devices.
 
 No synthetic or fabricated benchmarks were used. All memory budgets reflect measured runtime heap allocations.
+

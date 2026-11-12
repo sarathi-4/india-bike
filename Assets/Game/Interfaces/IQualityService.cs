@@ -15,3 +15,4 @@ namespace IndianBikeLife.Core.Interfaces
         float CurrentLODBias { get; }
     }
 }
+

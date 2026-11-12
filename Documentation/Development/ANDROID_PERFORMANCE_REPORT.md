@@ -86,3 +86,4 @@ Profiling was performed under heavy gameplay conditions (dense highway traffic, 
 - **Backgrounding (`OnApplicationPause`):** Simulation and audio processing pause immediately when the app loses focus, dropping CPU consumption to $<1\%$.
 - **VSync Handling:** `QualitySettings.vSyncCount = 0` combined with explicit `Application.targetFrameRate` prevents GPU driver spin-locks and uncontrolled frame rendering.
 - **Sleep Timeout:** Set to `SleepTimeout.NeverSleep` during active gameplay to eliminate unwanted screen dimming without forcing max brightness.
+

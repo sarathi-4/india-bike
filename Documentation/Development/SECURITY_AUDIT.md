@@ -82,3 +82,4 @@ A comprehensive security and privacy audit was performed on the release-ready co
 | Client-side APK decompilation | Low | IL2CPP binary compilation + ProGuard/R8 managed stripping (`link.xml`). | Mitigated |
 | Network man-in-the-middle on public Wi-Fi | Low | All network payloads require TLS 1.3 / HTTPS endpoints. | Mitigated |
 | Abusive text chat in multiplayer rooms | Low | Client regex profanity filter + mute/report manager. | Mitigated |
+
