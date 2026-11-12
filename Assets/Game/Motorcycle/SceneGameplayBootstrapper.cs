@@ -131,7 +131,7 @@ namespace IndianBikeLife.Motorcycle
             {
                 if (r == null || r.sharedMaterial == null) continue;
                 var s = r.sharedMaterial.shader;
-                bool isPink = s == null || s.name.Contains("Error") || s.name == "Hidden/InternalErrorShader";
+                bool isPink = s == null || !s.isSupported || s.name.Contains("Error") || s.name == "Hidden/InternalErrorShader";
 
                 if (isPink)
                 {
@@ -153,7 +153,6 @@ namespace IndianBikeLife.Motorcycle
                     r.sharedMaterial = IndianBikeLife.Core.Utilities.URPMaterialUtility.GetCachedColorMaterial(c, $"Fixed_{r.gameObject.name}");
                 }
             }
-        }
         }
     }
 }

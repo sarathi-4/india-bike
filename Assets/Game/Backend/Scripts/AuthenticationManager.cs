@@ -51,6 +51,15 @@ namespace IndianBikeLife.Backend
         public string CurrentUsername => _currentUsername;
         public string SessionToken => _sessionToken;
 
+        public AuthenticationManager()
+        {
+            // Pre-seed default demo account for testing
+            string demoEmail = "demo@indianbike.com";
+            string demoPass = "IndianBike2026";
+            string demoHash = TokenSecurityUtility.HashPassword(demoPass, demoEmail);
+            _registeredAccounts[demoEmail] = new UserAccountRecord("usr_demo_rider_01", demoEmail, demoHash, "IndianRider", guest: false);
+        }
+
         public void LoginAsGuest(Action<bool, string> onComplete)
         {
             string guestId = PlayerPrefs.GetString(GuestIdPrefKey, "");

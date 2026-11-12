@@ -15,16 +15,31 @@ namespace IndianBikeLife.Core.Utilities
 
         public static Shader GetURPShader()
         {
-            if (_urpShader != null) return _urpShader;
+            if (_urpShader != null && _urpShader.isSupported) return _urpShader;
 
-            // Probe standard URP shaders in priority order
-            _urpShader = Shader.Find("Universal Render Pipeline/Lit");
-            if (_urpShader == null) _urpShader = Shader.Find("Universal Render Pipeline/Simple Lit");
-            if (_urpShader == null) _urpShader = Shader.Find("Universal Render Pipeline/Unlit");
-            if (_urpShader == null) _urpShader = Shader.Find("Unlit/Color");
-            if (_urpShader == null) _urpShader = Shader.Find("Sprites/Default");
-            if (_urpShader == null) _urpShader = Shader.Find("Standard");
+            // Probe standard shaders in priority order based on active pipeline
+            string[] shaderCandidates = new[]
+            {
+                "Universal Render Pipeline/Lit",
+                "Universal Render Pipeline/Simple Lit",
+                "Universal Render Pipeline/Unlit",
+                "Mobile/Diffuse",
+                "Standard",
+                "Unlit/Color",
+                "Sprites/Default"
+            };
 
+            foreach (var name in shaderCandidates)
+            {
+                var s = Shader.Find(name);
+                if (s != null && s.isSupported && !s.name.Contains("Error") && s.name != "Hidden/InternalErrorShader")
+                {
+                    _urpShader = s;
+                    return _urpShader;
+                }
+            }
+
+            _urpShader = Shader.Find("Sprites/Default") ?? Shader.Find("Unlit/Color");
             return _urpShader;
         }
 
@@ -37,12 +52,13 @@ namespace IndianBikeLife.Core.Utilities
                 color = color
             };
 
-            // URP uses _BaseColor property name
+            // Support both URP (_BaseColor) and Legacy Standard (_Color)
             if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
             if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
 
             if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
             if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);
+            if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", smoothness);
 
             return mat;
         }

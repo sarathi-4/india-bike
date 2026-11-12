@@ -95,6 +95,11 @@ namespace IndianBikeLife.Core.Managers
                 QualitySettings.SetQualityLevel(qualityLevel, applyExpensiveChanges: true);
             }
 
+            if (QualitySettings.renderPipeline == null && UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+            {
+                QualitySettings.renderPipeline = UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline;
+            }
+
             // 2. Mobile Framerate & VSync
             QualitySettings.vSyncCount = 0; // Essential for Android battery & thermal management
 
