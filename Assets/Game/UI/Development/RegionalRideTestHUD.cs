@@ -40,7 +40,7 @@ namespace IndianBikeLife.Core.UI.Development
         private IVoiceChatService _voiceChatService;
         private IBackendService _backendService;
 
-        private bool _showHUD = true;
+        private bool _showHUD = false;
 
         private void Start()
         {
@@ -72,6 +72,11 @@ namespace IndianBikeLife.Core.UI.Development
 
         private void OnGUI()
         {
+            if (GUI.Button(new Rect(15, 52, 110, 26), _showHUD ? "✖ Close Tools" : "🛠️ Debug Tools"))
+            {
+                _showHUD = !_showHUD;
+            }
+
             if (!_showHUD) return;
 
             int w = Screen.width;
