@@ -8,6 +8,7 @@ using IndianBikeLife.Core.Services;
 using IndianBikeLife.Core.State;
 using IndianBikeLife.Core.Utilities.Logger;
 using UnityEngine;
+using AudioConfiguration = IndianBikeLife.Core.Configuration.AudioConfiguration;
 
 namespace IndianBikeLife.Core.Bootstrapping
 {

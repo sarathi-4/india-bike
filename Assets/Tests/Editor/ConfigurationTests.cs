@@ -2,6 +2,7 @@ using IndianBikeLife.Core.Audio;
 using IndianBikeLife.Core.Configuration;
 using NUnit.Framework;
 using UnityEngine;
+using AudioConfiguration = IndianBikeLife.Core.Configuration.AudioConfiguration;
 
 namespace IndianBikeLife.Tests.Editor
 {
