@@ -6,7 +6,6 @@ namespace IndianBikeLife.RoadSystem
     /// Component placed on road colliders to supply surface friction, speed limits,
     /// and surface feedback to motorcycle physics and wheel colliders.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
     public class RoadPhysicsSurface : MonoBehaviour
     {
         [Header("Surface Properties")]

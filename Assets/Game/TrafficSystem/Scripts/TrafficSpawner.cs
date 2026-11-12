@@ -80,6 +80,12 @@ namespace IndianBikeLife.TrafficSystem
             go.name = $"Traffic_{type}";
             go.transform.SetParent(transform);
 
+            Color trafficColor = (type == IndianVehicleType.AutoRickshaw) ? new Color(0.95f, 0.85f, 0.15f) :
+                                 (type == IndianVehicleType.CityBus) ? new Color(0.85f, 0.22f, 0.18f) :
+                                 (type == IndianVehicleType.HeavyTruck) ? new Color(0.22f, 0.45f, 0.82f) :
+                                 new Color(0.85f, 0.85f, 0.88f);
+            IndianBikeLife.Core.Utilities.URPMaterialUtility.ApplyURPColor(go, trafficColor, $"Mat_Traffic_{type}");
+
             // Shape according to vehicle type
             if (type == IndianVehicleType.CityBus || type == IndianVehicleType.HeavyTruck)
             {

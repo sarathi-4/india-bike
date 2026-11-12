@@ -45,6 +45,7 @@ namespace IndianBikeLife.EnvironmentSystem
                 tree.transform.position = position + Vector3.up * 3f;
                 tree.transform.localScale = new Vector3(0.6f * scale, 3f * scale, 0.6f * scale);
                 tree.transform.SetParent(transform);
+                IndianBikeLife.Core.Utilities.URPMaterialUtility.ApplyURPColor(tree, new Color(0.35f, 0.22f, 0.14f), "Mat_Tree_Trunk");
 
                 // Add foliage sphere
                 GameObject foliage = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -52,6 +53,7 @@ namespace IndianBikeLife.EnvironmentSystem
                 foliage.transform.SetParent(tree.transform);
                 foliage.transform.localPosition = new Vector3(0f, 1.2f, 0f);
                 foliage.transform.localScale = new Vector3(4f, 2.5f, 4f);
+                IndianBikeLife.Core.Utilities.URPMaterialUtility.ApplyURPColor(foliage, new Color(0.18f, 0.52f, 0.18f), "Mat_Tree_Leaf");
             }
 
             tree.transform.localScale *= scale;

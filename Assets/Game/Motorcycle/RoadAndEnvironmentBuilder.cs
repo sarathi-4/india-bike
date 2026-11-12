@@ -234,19 +234,14 @@ namespace IndianBikeLife.Motorcycle
 
         private void CreateMaterials()
         {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-
-            _asphaltMat = new Material(shader) { name = "Mat_NH44_Asphalt", color = new Color(0.18f, 0.18f, 0.20f) };
-            if (_asphaltMat.HasProperty("_Smoothness")) _asphaltMat.SetFloat("_Smoothness", 0.15f);
-
-            _markingWhiteMat = new Material(shader) { name = "Mat_RoadMarking_White", color = new Color(0.95f, 0.95f, 0.95f) };
-            _markingYellowMat = new Material(shader) { name = "Mat_RoadMarking_Yellow", color = new Color(0.98f, 0.78f, 0.12f) };
-
-            _grassMat = new Material(shader) { name = "Mat_Roadside_Grass", color = new Color(0.28f, 0.42f, 0.22f) };
-            _dhabaWallMat = new Material(shader) { name = "Mat_Dhaba_Wall", color = new Color(0.92f, 0.82f, 0.65f) };
-            _dhabaRoofMat = new Material(shader) { name = "Mat_Dhaba_Roof", color = new Color(0.68f, 0.22f, 0.18f) };
-            _woodMat = new Material(shader) { name = "Mat_Wood_Trunk", color = new Color(0.35f, 0.22f, 0.14f) };
-            _leafMat = new Material(shader) { name = "Mat_Tree_Leaf", color = new Color(0.18f, 0.48f, 0.18f) };
+            _asphaltMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_NH44_Asphalt", new Color(0.18f, 0.18f, 0.20f), 0.1f, 0.2f);
+            _markingWhiteMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_RoadMarking_White", new Color(0.95f, 0.95f, 0.95f), 0f, 0.1f);
+            _markingYellowMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_RoadMarking_Yellow", new Color(0.98f, 0.78f, 0.12f), 0f, 0.1f);
+            _grassMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Roadside_Grass", new Color(0.28f, 0.42f, 0.22f), 0f, 0.05f);
+            _dhabaWallMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Dhaba_Wall", new Color(0.92f, 0.82f, 0.65f), 0f, 0.1f);
+            _dhabaRoofMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Dhaba_Roof", new Color(0.68f, 0.22f, 0.18f), 0f, 0.2f);
+            _woodMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Wood_Trunk", new Color(0.35f, 0.22f, 0.14f), 0f, 0.1f);
+            _leafMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Tree_Leaf", new Color(0.18f, 0.48f, 0.18f), 0f, 0.1f);
         }
     }
 }

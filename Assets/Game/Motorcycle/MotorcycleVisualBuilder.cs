@@ -268,29 +268,20 @@ namespace IndianBikeLife.Motorcycle
 
         private void CreateMaterials()
         {
-            _bodyMat = CreateStandardMaterial("Mat_Bike_Body", _bodyPaintColor, 0.7f, 0.4f);
-            _chromeMat = CreateStandardMaterial("Mat_Bike_Chrome", _chromeColor, 0.9f, 0.9f);
-            _engineMat = CreateStandardMaterial("Mat_Bike_Engine", _engineColor, 0.4f, 0.2f);
-            _rubberMat = CreateStandardMaterial("Mat_Bike_Rubber", _rubberColor, 0.1f, 0.1f);
-            _seatMat = CreateStandardMaterial("Mat_Bike_Leather", _seatColor, 0.2f, 0.1f);
+            _bodyMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Body", _bodyPaintColor, 0.7f, 0.6f);
+            _chromeMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Chrome", _chromeColor, 0.95f, 0.9f);
+            _engineMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Engine", _engineColor, 0.5f, 0.3f);
+            _rubberMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Rubber", _rubberColor, 0.05f, 0.1f);
+            _seatMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Leather", _seatColor, 0.1f, 0.2f);
 
-            _lightMat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"));
-            _lightMat.color = Color.red;
+            _lightMat = IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial("Mat_Bike_Taillight", Color.red, 0.1f, 0.8f);
             _lightMat.EnableKeyword("_EMISSION");
-            _lightMat.SetColor("_EmissionColor", Color.red * 2.5f);
+            if (_lightMat.HasProperty("_EmissionColor")) _lightMat.SetColor("_EmissionColor", Color.red * 2.5f);
         }
 
         private Material CreateStandardMaterial(string name, Color color, float metallic = 0.5f, float smoothness = 0.5f)
         {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            Material mat = new Material(shader)
-            {
-                name = name,
-                color = color
-            };
-            if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
-            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);
-            return mat;
+            return IndianBikeLife.Core.Utilities.URPMaterialUtility.CreateURPMaterial(name, color, metallic, smoothness);
         }
     }
 }

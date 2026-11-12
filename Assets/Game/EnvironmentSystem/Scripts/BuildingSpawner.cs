@@ -82,6 +82,13 @@ namespace IndianBikeLife.EnvironmentSystem
                 ? new Vector3(8f, 3.5f, 5f)
                 : new Vector3(10f, 6f, 10f);
             go.transform.SetParent(transform);
+
+            Color bldgColor = (style == BuildingStyle.IndianDhabaTeaStall) ? new Color(0.95f, 0.78f, 0.22f) :
+                              (style == BuildingStyle.Temple) ? new Color(0.92f, 0.45f, 0.15f) :
+                              (style == BuildingStyle.PetrolPump) ? new Color(0.15f, 0.45f, 0.85f) :
+                              new Color(0.88f, 0.82f, 0.72f);
+            IndianBikeLife.Core.Utilities.URPMaterialUtility.ApplyURPColor(go, bldgColor, $"Mat_{style}");
+
             return go;
         }
     }
