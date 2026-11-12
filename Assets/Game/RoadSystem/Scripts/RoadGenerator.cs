@@ -17,6 +17,7 @@ namespace IndianBikeLife.RoadSystem
         [SerializeField] private Material _roadMaterial;
         [SerializeField] private bool _generateCollider = true;
         [SerializeField] private float _curbHeight = 0.15f;
+        public float CurbHeight => _curbHeight;
 
         private RoadSpline _spline;
 

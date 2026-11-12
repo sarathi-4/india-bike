@@ -36,7 +36,7 @@ namespace IndianBikeLife.Multiplayer
                 room.isPrivate = true;
             }
 
-            var hostSlot = new RoomPlayerSlot(hostId, hostName, 0, isHost: true);
+            var hostSlot = new RoomPlayerSlot(hostId, hostName, 0, host: true);
             room.players.Add(hostSlot);
 
             _activeRooms[code] = room;
@@ -86,7 +86,7 @@ namespace IndianBikeLife.Multiplayer
             }
 
             int availableSlot = room.GetNextAvailableSlot();
-            var newSlot = new RoomPlayerSlot(playerId, playerName, availableSlot, isHost: false);
+            var newSlot = new RoomPlayerSlot(playerId, playerName, availableSlot, host: false);
             room.players.Add(newSlot);
             _currentRoom = room;
 

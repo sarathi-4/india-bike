@@ -10,7 +10,6 @@ namespace IndianBikeLife.Communication.UI
     public class ChatHUD : MonoBehaviour
     {
         private IChatService _chatService;
-        private string _inputMessage = "";
         private bool _showQuickChatGrid = false;
         private bool _showHUD = true;
 

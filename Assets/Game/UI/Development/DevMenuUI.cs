@@ -1,6 +1,7 @@
 using System;
 using IndianBikeLife.Core.Audio;
 using IndianBikeLife.Core.Configuration;
+using IndianBikeLife.Core.Input;
 using IndianBikeLife.Core.Interfaces;
 using IndianBikeLife.Core.SaveSystem.Data;
 using IndianBikeLife.Core.Services;

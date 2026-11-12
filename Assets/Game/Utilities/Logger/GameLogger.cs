@@ -40,7 +40,7 @@ namespace IndianBikeLife.Core.Utilities.Logger
         {
             if (_isInitialized) return;
 
-#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
+#if !DEBUG && !UNITY_EDITOR
             // Default to Warning or higher in release builds for mobile performance
             _minimumLogLevel = LogLevel.Warning;
 #else

@@ -13,14 +13,14 @@ namespace IndianBikeLife.WeatherSystem
 
         private void Start()
         {
-            _cachedRoadSurfaces = FindObjectsOfType<RoadPhysicsSurface>();
+            _cachedRoadSurfaces = FindObjectsByType<RoadPhysicsSurface>(FindObjectsSortMode.None);
         }
 
         public void ApplyWetness(bool isRaining, float roadGripFactor)
         {
             if (_cachedRoadSurfaces == null || _cachedRoadSurfaces.Length == 0)
             {
-                _cachedRoadSurfaces = FindObjectsOfType<RoadPhysicsSurface>();
+                _cachedRoadSurfaces = FindObjectsByType<RoadPhysicsSurface>(FindObjectsSortMode.None);
             }
 
             for (int i = 0; i < _cachedRoadSurfaces.Length; i++)

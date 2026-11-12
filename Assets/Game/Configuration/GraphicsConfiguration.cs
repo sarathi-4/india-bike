@@ -56,8 +56,32 @@ namespace IndianBikeLife.Core.Configuration
 
             QualitySettings.vSyncCount = 0; // Essential for Android
             Application.targetFrameRate = targetFps;
+            QualitySettings.shadowDistance = preset == MobileQualityPreset.Low ? _lowShadowDistance :
+                                             preset == MobileQualityPreset.Medium ? _medShadowDistance : _highShadowDistance;
 
             GameLogger.I("GraphicsConfig", $"Applied quality preset: {preset} (Target FPS: {targetFps})");
+        }
+
+        public float GetRenderScaleForPreset(MobileQualityPreset preset)
+        {
+            switch (preset)
+            {
+                case MobileQualityPreset.Low: return _lowRenderScale;
+                case MobileQualityPreset.Medium: return _medRenderScale;
+                case MobileQualityPreset.High: return _highRenderScale;
+                default: return 1.0f;
+            }
+        }
+
+        public float GetShadowDistanceForPreset(MobileQualityPreset preset)
+        {
+            switch (preset)
+            {
+                case MobileQualityPreset.Low: return _lowShadowDistance;
+                case MobileQualityPreset.Medium: return _medShadowDistance;
+                case MobileQualityPreset.High: return _highShadowDistance;
+                default: return 50f;
+            }
         }
 
         public int GetTargetFpsForPreset(MobileQualityPreset preset)

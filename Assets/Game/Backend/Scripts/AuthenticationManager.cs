@@ -94,7 +94,7 @@ namespace IndianBikeLife.Backend
             string uid = "usr_" + Guid.NewGuid().ToString("N").Substring(0, 10);
             string passHash = TokenSecurityUtility.HashPassword(password, cleanEmail);
 
-            var record = new UserAccountRecord(uid, cleanEmail, passHash, username, isGuest: false);
+            var record = new UserAccountRecord(uid, cleanEmail, passHash, username, guest: false);
             _registeredAccounts[cleanEmail] = record;
 
             _currentUserId = uid;

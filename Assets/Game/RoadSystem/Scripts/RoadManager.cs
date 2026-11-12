@@ -26,13 +26,13 @@ namespace IndianBikeLife.RoadSystem
             if (_isInitialized) return;
 
             // Automatically find roads in the active scene if present
-            RoadSpline[] foundRoads = FindObjectsOfType<RoadSpline>();
+            RoadSpline[] foundRoads = FindObjectsByType<RoadSpline>(FindObjectsSortMode.None);
             for (int i = 0; i < foundRoads.Length; i++)
             {
                 RegisterRoad(foundRoads[i]);
             }
 
-            RoadIntersection[] foundJunctions = FindObjectsOfType<RoadIntersection>();
+            RoadIntersection[] foundJunctions = FindObjectsByType<RoadIntersection>(FindObjectsSortMode.None);
             for (int i = 0; i < foundJunctions.Length; i++)
             {
                 if (!_intersections.Contains(foundJunctions[i]))

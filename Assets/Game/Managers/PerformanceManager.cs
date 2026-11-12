@@ -34,7 +34,7 @@ namespace IndianBikeLife.Core.Managers
         {
             if (_isInitialized) return;
 
-#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
+#if !DEBUG && !UNITY_EDITOR
             _isOverlayVisible = false;
 #else
             _isOverlayVisible = _showOverlayByDefault;
@@ -90,7 +90,7 @@ namespace IndianBikeLife.Core.Managers
             _isOverlayVisible = !_isOverlayVisible;
         }
 
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEBUG || UNITY_EDITOR
         private void OnGUI()
         {
             if (!_isOverlayVisible) return;

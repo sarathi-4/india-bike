@@ -12,6 +12,7 @@ namespace IndianBikeLife.RoadSystem
         [Header("Lane Settings (Left-Hand Traffic)")]
         [Tooltip("Standard Indian driving side: Left.")]
         [SerializeField] private bool _leftHandTraffic = true;
+        public bool IsLeftHandTraffic => _leftHandTraffic;
         [SerializeField] private float _leftLaneOffset = -1.8f;  // Normal cruising lane
         [SerializeField] private float _rightLaneOffset = 1.8f;  // Oncoming lane
 
