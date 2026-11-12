@@ -55,7 +55,6 @@ namespace IndianBikeLife.Core.UI
 
         // 1. Splash Screen State
         private float _splashProgress = 0.85f;
-        private bool _isSplashAutoAdvancing = false;
 
         // 2. Main Menu & Profile State
         private string _playerName = "Player001";
@@ -80,6 +79,7 @@ namespace IndianBikeLife.Core.UI
         private readonly float[] _bikeFuels = new[] { 0.90f, 0.85f, 0.82f, 0.75f, 0.95f, 0.80f };
 
         private int _selectedColorIndex = 0;
+        private bool _isCoupleRiding = false;
         private readonly Color[] _bikeColors = new[]
         {
             new Color(0.85f, 0.12f, 0.15f), // Racing Red (Yamaha/Enfield)
@@ -498,9 +498,18 @@ namespace IndianBikeLife.Core.UI
             // Blue CUSTOMIZE Button
             GUI.backgroundColor = new Color(0.12f, 0.50f, 0.98f);
             GUIStyle custStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
-            if (GUILayout.Button("CUSTOMIZE COLOR", custStyle, GUILayout.Height(38)))
+            if (GUILayout.Button("CUSTOMIZE COLOR", custStyle, GUILayout.Height(36)))
             {
                 _selectedColorIndex = (_selectedColorIndex + 1) % _bikeColors.Length;
+                ApplyCustomizationsToBike();
+            }
+
+            GUILayout.Space(6);
+            // Passenger Toggle (Couple Riding)
+            GUI.backgroundColor = _isCoupleRiding ? new Color(0.85f, 0.35f, 0.65f) : new Color(0.35f, 0.45f, 0.60f);
+            if (GUILayout.Button(_isCoupleRiding ? "👥 COUPLE: ON" : "👤 SOLO RIDER", GUILayout.Height(32)))
+            {
+                _isCoupleRiding = !_isCoupleRiding;
                 ApplyCustomizationsToBike();
             }
             GUI.backgroundColor = Color.white;
@@ -739,7 +748,12 @@ namespace IndianBikeLife.Core.UI
             {
                 _motorcycle?.TriggerHorn();
             }
-            if (GUI.Button(new Rect(iconX, iconY + 100, 40, 40), "⚙️"))
+            if (GUI.Button(new Rect(iconX, iconY + 95, 40, 40), "👥"))
+            {
+                _isCoupleRiding = !_isCoupleRiding;
+                ApplyCustomizationsToBike();
+            }
+            if (GUI.Button(new Rect(iconX, iconY + 140, 40, 40), "⚙️"))
             {
                 CurrentScreen = GameScreen.MainMenu;
             }
