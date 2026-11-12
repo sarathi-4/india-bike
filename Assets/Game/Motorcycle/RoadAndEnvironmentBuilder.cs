@@ -57,6 +57,13 @@ namespace IndianBikeLife.Motorcycle
                 DestroyImmediate(_worldRoot);
             }
 
+            // Disable legacy straight road if present in scene
+            var legacyRoad = GameObject.Find("HighwayRoad_NH44");
+            if (legacyRoad != null)
+            {
+                legacyRoad.SetActive(false);
+            }
+
             _worldRoot = new GameObject("[Indian_Highway_World_Corridor]");
             _worldRoot.transform.SetParent(transform, false);
 
@@ -117,7 +124,7 @@ namespace IndianBikeLife.Motorcycle
             Debug.Log($"[RoadAndEnvironmentBuilder] Built State {_activeStateIndex} Corridor with {_totalSegments} curved road segments!");
         }
 
-        private Vector3 CalculateRoadPosition(float z, int stateIdx)
+        public Vector3 CalculateRoadPosition(float z, int stateIdx)
         {
             float x = 0f;
             float y = 0f;
@@ -161,6 +168,14 @@ namespace IndianBikeLife.Motorcycle
             }
 
             return new Vector3(x, y, z);
+        }
+
+        public Vector3 CalculateRoadDirection(float z, int stateIdx)
+        {
+            Vector3 p0 = CalculateRoadPosition(z, stateIdx);
+            Vector3 p1 = CalculateRoadPosition(z + 5f, stateIdx);
+            Vector3 d = (p1 - p0).normalized;
+            return d.sqrMagnitude > 0.001f ? d : Vector3.forward;
         }
 
         private void BuildTerrainLandscape(Transform parent, int stateIdx)

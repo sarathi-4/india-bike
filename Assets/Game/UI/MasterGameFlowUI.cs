@@ -1596,11 +1596,12 @@ namespace IndianBikeLife.Core.UI
             if (_motorcycle != null)
             {
                 float baseSpeed = _bikeSpeeds[_selectedBikeIndex] * 165f;
+                float accel = 24f + (_selectedBikeIndex * 2.5f);
                 _motorcycle.ApplyBikeTuning(
                     _bikeModelNames[_selectedBikeIndex],
                     baseSpeed,
-                    8.5f,
-                    28f
+                    accel,
+                    36f
                 );
             }
         }

@@ -75,9 +75,15 @@ namespace IndianBikeLife.Motorcycle
 
         private void Awake()
         {
+            var boxCol = GetComponent<BoxCollider>();
+            if (boxCol != null) Destroy(boxCol);
+
             _characterController = GetComponent<CharacterController>();
-            _characterController.stepOffset = 0.35f;
-            _characterController.slopeLimit = 45f;
+            if (_characterController != null)
+            {
+                _characterController.stepOffset = 0.35f;
+                _characterController.slopeLimit = 45f;
+            }
             _currentNitro = _maxNitro;
         }
 
@@ -144,10 +150,15 @@ namespace IndianBikeLife.Motorcycle
             float vert = Input.GetAxisRaw("Vertical");
             float horiz = Input.GetAxisRaw("Horizontal");
 
-            if (vert > 0.05f) throttle = Mathf.Max(throttle, vert);
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) throttle = 1f;
+            else if (vert > 0.05f) throttle = Mathf.Max(throttle, vert);
+
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) brake = 1f;
             else if (vert < -0.05f) brake = Mathf.Max(brake, -vert);
 
-            if (Mathf.Abs(horiz) > 0.05f) steer = horiz;
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) steer = -1f;
+            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) steer = 1f;
+            else if (Mathf.Abs(horiz) > 0.05f) steer = horiz;
 
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) nitro = true;
             if (Input.GetKey(KeyCode.Space)) brake = 1f;
@@ -215,23 +226,18 @@ namespace IndianBikeLife.Motorcycle
 
         private void UpdateSteeringAndLean(float steerInput)
         {
-            // Speed-adaptive steering sensitivity: high speed requires smooth gentle turns
             float speedAbs = Mathf.Abs(_currentSpeedKmh);
-            float steerFactor = Mathf.Lerp(1.0f, 0.35f, Mathf.Clamp01(speedAbs / 90f));
+            float steerFactor = Mathf.Lerp(1.2f, 0.40f, Mathf.Clamp01(speedAbs / 90f));
             float targetSteerAngle = steerInput * _steerSensitivity * steerFactor;
 
             _currentSteerAngle = Mathf.Lerp(_currentSteerAngle, targetSteerAngle, Time.deltaTime * 14f);
 
-            // Turn motorcycle yaw smoothly only when moving with realistic turning radius
-            if (speedAbs > 0.4f)
-            {
-                float turnDir = Mathf.Sign(_currentSpeedKmh);
-                float speedWeight = Mathf.Clamp(speedAbs / 45f, 0.25f, 1.1f);
-                float maxTurnPerSec = 75f; // Clamped maximum turn rate prevents wild 360 spinning
-                float rawTurn = _currentSteerAngle * turnDir * speedWeight * Time.deltaTime * 28f;
-                float clampedTurn = Mathf.Clamp(rawTurn, -maxTurnPerSec * Time.deltaTime, maxTurnPerSec * Time.deltaTime);
-                transform.Rotate(0f, clampedTurn, 0f);
-            }
+            // Turn motorcycle yaw: even at stationary/low speed allows turning to steer away from barriers
+            float turnSpeedWeight = Mathf.Clamp(speedAbs / 35f, 0.45f, 1.2f);
+            float maxTurnPerSec = 85f;
+            float rawTurn = _currentSteerAngle * turnSpeedWeight * Time.deltaTime * 32f;
+            float clampedTurn = Mathf.Clamp(rawTurn, -maxTurnPerSec * Time.deltaTime, maxTurnPerSec * Time.deltaTime);
+            transform.Rotate(0f, clampedTurn, 0f);
 
             // Calculate dynamic motorcycle cornering lean
             float targetLean = -steerInput * _maxLeanAngle * Mathf.Clamp01(speedAbs / 35f);
@@ -248,13 +254,22 @@ namespace IndianBikeLife.Motorcycle
             _externalThrottle = 0f;
             _externalBrake = 0f;
 
-            // Re-align upright facing along forward road direction
-            Vector3 currentEuler = transform.eulerAngles;
-            transform.eulerAngles = new Vector3(0f, currentEuler.y, 0f);
-
-            // Snap onto road surface
-            Vector3 p = transform.position;
-            transform.position = new Vector3(Mathf.Clamp(p.x, -5f, 5f), 0.65f, p.z);
+            var roadGen = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
+            if (roadGen != null)
+            {
+                float z = transform.position.z;
+                if (z < 10f || z > 1950f) z = 12f;
+                Vector3 pt = roadGen.CalculateRoadPosition(z, roadGen.ActiveStateIndex);
+                Vector3 dir = roadGen.CalculateRoadDirection(z, roadGen.ActiveStateIndex);
+                transform.position = pt + Vector3.up * 0.65f;
+                transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+            }
+            else
+            {
+                Vector3 currentEuler = transform.eulerAngles;
+                transform.eulerAngles = new Vector3(0f, currentEuler.y, 0f);
+                transform.position = new Vector3(0f, 0.65f, transform.position.z);
+            }
         }
 
         private void UpdateMotion()

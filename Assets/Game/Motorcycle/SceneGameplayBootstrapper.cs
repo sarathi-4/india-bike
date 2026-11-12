@@ -36,16 +36,19 @@ namespace IndianBikeLife.Motorcycle
             }
 
             // 1. Locate or create Player Motorcycle
-            GameObject bikeObj = GameObject.FindWithTag("Motorcycle");
-            if (bikeObj == null)
-            {
-                bikeObj = GameObject.Find("[PlayerMotorcycle]");
-            }
+            GameObject bikeObj = GameObject.FindWithTag("Motorcycle") ?? GameObject.Find("[PlayerMotorcycle]");
             if (bikeObj == null)
             {
                 bikeObj = new GameObject("[PlayerMotorcycle]");
                 bikeObj.tag = "Motorcycle";
                 bikeObj.transform.position = new Vector3(0f, 0.5f, 5f);
+            }
+
+            // Remove any legacy BoxCollider that blocks the CharacterController
+            var legacyBox = bikeObj.GetComponent<BoxCollider>();
+            if (legacyBox != null)
+            {
+                Destroy(legacyBox);
             }
 
             // Ensure CharacterController
@@ -106,6 +109,13 @@ namespace IndianBikeLife.Motorcycle
                 envBuilder = roadEnv.AddComponent<RoadAndEnvironmentBuilder>();
             }
 
+            // Disable legacy straight road so curved road is active
+            var legacyRoad = GameObject.Find("HighwayRoad_NH44");
+            if (legacyRoad != null)
+            {
+                legacyRoad.SetActive(false);
+            }
+
             // 4. Ensure In-Game Mobile Gameplay HUD
             var gameplayHUD = FindFirstObjectByType<GameplayHUD>();
             if (gameplayHUD == null)
@@ -122,9 +132,11 @@ namespace IndianBikeLife.Motorcycle
                 masterMenu = menuObj.AddComponent<IndianBikeLife.Core.UI.MasterGameFlowUI>();
             }
 
-            // Reposition motorcycle properly on top of the road surface
-            bikeObj.transform.position = new Vector3(-2.2f, 0.6f, 12f);
-            bikeObj.transform.rotation = Quaternion.identity;
+            // Reposition motorcycle properly aligned along the curved road surface
+            Vector3 roadPos = envBuilder.CalculateRoadPosition(12f, envBuilder.ActiveStateIndex);
+            Vector3 roadDir = envBuilder.CalculateRoadDirection(12f, envBuilder.ActiveStateIndex);
+            bikeObj.transform.position = roadPos + Vector3.up * 0.65f;
+            bikeObj.transform.rotation = Quaternion.LookRotation(roadDir, Vector3.up);
 
             // Heal any pink shaders in the scene
             FixPinkMaterialsInScene();

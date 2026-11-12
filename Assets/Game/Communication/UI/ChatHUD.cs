@@ -26,6 +26,7 @@ namespace IndianBikeLife.Communication.UI
         private void OnGUI()
         {
             if (!_showHUD || _chatService == null) return;
+            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null && IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen) return;
 
             int w = Screen.width;
             int h = Screen.height;
