@@ -22,8 +22,12 @@ namespace IndianBikeLife.Motorcycle
         private Material _rubberMat;
         private Material _seatMat;
         private Material _lightMat;
+        private Material _riderJacketMat;
+        private Material _riderHelmetMat;
+        private Material _riderVisorMat;
 
         private GameObject _passengerVisual;
+        private GameObject _riderVisual;
 
         public GameObject PassengerVisual => _passengerVisual;
 
@@ -180,33 +184,33 @@ namespace IndianBikeLife.Motorcycle
 
         private void CreateRiderCharacter(Transform parent)
         {
-            Material jacketMat = CreateStandardMaterial("Rider_Jacket", new Color(0.18f, 0.22f, 0.28f)); // Dark Navy Riding Jacket
-            Material helmetMat = CreateStandardMaterial("Rider_Helmet", new Color(0.95f, 0.75f, 0.15f)); // Golden Yellow Full-Face Helmet
-            Material visorMat = CreateStandardMaterial("Rider_Visor", new Color(0.08f, 0.08f, 0.10f));   // Tinted Black Visor
+            _riderJacketMat = CreateStandardMaterial("Rider_Jacket", new Color(0.18f, 0.22f, 0.28f)); // Dark Navy Riding Jacket
+            _riderHelmetMat = CreateStandardMaterial("Rider_Helmet", new Color(0.95f, 0.75f, 0.15f)); // Golden Yellow Full-Face Helmet
+            _riderVisorMat = CreateStandardMaterial("Rider_Visor", new Color(0.08f, 0.08f, 0.10f));   // Tinted Black Visor
 
-            GameObject riderRoot = new GameObject("Rider_Character");
-            riderRoot.transform.SetParent(parent, false);
+            _riderVisual = new GameObject("Rider_Character");
+            _riderVisual.transform.SetParent(parent, false);
 
             // Torso (leaning slightly forward into handlebars)
-            GameObject torso = CreatePrimitive(PrimitiveType.Cube, "Rider_Torso", riderRoot.transform,
-                new Vector3(0f, 1.15f, -0.22f), new Vector3(0.38f, 0.48f, 0.26f), jacketMat);
+            GameObject torso = CreatePrimitive(PrimitiveType.Cube, "Rider_Torso", _riderVisual.transform,
+                new Vector3(0f, 1.15f, -0.22f), new Vector3(0.38f, 0.48f, 0.26f), _riderJacketMat);
             torso.transform.localRotation = Quaternion.Euler(14f, 0f, 0f);
 
             // Head & Helmet
-            GameObject helmet = CreatePrimitive(PrimitiveType.Sphere, "Rider_Helmet", riderRoot.transform,
-                new Vector3(0f, 1.52f, -0.12f), new Vector3(0.28f, 0.32f, 0.30f), helmetMat);
+            GameObject helmet = CreatePrimitive(PrimitiveType.Sphere, "Rider_Helmet", _riderVisual.transform,
+                new Vector3(0f, 1.52f, -0.12f), new Vector3(0.28f, 0.32f, 0.30f), _riderHelmetMat);
 
             // Helmet Visor
             CreatePrimitive(PrimitiveType.Cube, "Rider_Visor", helmet.transform,
-                new Vector3(0f, 0.04f, 0.42f), new Vector3(0.72f, 0.32f, 0.32f), visorMat);
+                new Vector3(0f, 0.04f, 0.42f), new Vector3(0.72f, 0.32f, 0.32f), _riderVisorMat);
 
             // Arms extending to handlebars
-            CreatePrimitive(PrimitiveType.Cylinder, "Rider_Arm_L", riderRoot.transform,
-                new Vector3(-0.25f, 1.15f, 0.12f), new Vector3(0.09f, 0.35f, 0.09f), jacketMat)
+            CreatePrimitive(PrimitiveType.Cylinder, "Rider_Arm_L", _riderVisual.transform,
+                new Vector3(-0.25f, 1.15f, 0.12f), new Vector3(0.09f, 0.35f, 0.09f), _riderJacketMat)
                 .transform.localRotation = Quaternion.Euler(45f, -22f, 0f);
 
-            CreatePrimitive(PrimitiveType.Cylinder, "Rider_Arm_R", riderRoot.transform,
-                new Vector3(0.25f, 1.15f, 0.12f), new Vector3(0.09f, 0.35f, 0.09f), jacketMat)
+            CreatePrimitive(PrimitiveType.Cylinder, "Rider_Arm_R", _riderVisual.transform,
+                new Vector3(0.25f, 1.15f, 0.12f), new Vector3(0.09f, 0.35f, 0.09f), _riderJacketMat)
                 .transform.localRotation = Quaternion.Euler(45f, 22f, 0f);
         }
 
@@ -250,6 +254,32 @@ namespace IndianBikeLife.Motorcycle
             {
                 if (_bodyMat.HasProperty("_BaseColor")) _bodyMat.SetColor("_BaseColor", color);
                 if (_bodyMat.HasProperty("_Color")) _bodyMat.SetColor("_Color", color);
+            }
+        }
+
+        public void SetRiderJacketColor(Color color)
+        {
+            if (_riderJacketMat != null)
+            {
+                if (_riderJacketMat.HasProperty("_BaseColor")) _riderJacketMat.SetColor("_BaseColor", color);
+                if (_riderJacketMat.HasProperty("_Color")) _riderJacketMat.SetColor("_Color", color);
+            }
+        }
+
+        public void SetRiderHelmetColor(Color color)
+        {
+            if (_riderHelmetMat != null)
+            {
+                if (_riderHelmetMat.HasProperty("_BaseColor")) _riderHelmetMat.SetColor("_BaseColor", color);
+                if (_riderHelmetMat.HasProperty("_Color")) _riderHelmetMat.SetColor("_Color", color);
+            }
+        }
+
+        public void SetRiderBuildScale(float muscleScale)
+        {
+            if (_riderVisual != null)
+            {
+                _riderVisual.transform.localScale = new Vector3(muscleScale, 1f, muscleScale);
             }
         }
 
