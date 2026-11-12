@@ -6,3 +6,4 @@ namespace IndianBikeLife.Progression.Economy
         GoldCoins
     }
 }
+

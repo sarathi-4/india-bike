@@ -14,3 +14,4 @@ namespace IndianBikeLife.Core.Interfaces
         LeaderboardEntry GetPlayerEntry(LeaderboardType type);
     }
 }
+

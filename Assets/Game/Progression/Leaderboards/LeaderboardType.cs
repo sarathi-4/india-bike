@@ -8,3 +8,4 @@ namespace IndianBikeLife.Progression.Leaderboards
         WeeklyChallengePoints
     }
 }
+

@@ -20,3 +20,4 @@ namespace IndianBikeLife.Core.Interfaces
         IReadOnlyList<TransactionRecord> GetTransactionHistory();
     }
 }
+

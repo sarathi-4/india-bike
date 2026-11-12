@@ -42,3 +42,4 @@ namespace IndianBikeLife.Core.Interfaces
         IReadOnlyList<string> CompletedMissionIds { get; }
     }
 }
+

@@ -18,3 +18,4 @@ namespace IndianBikeLife.Core.Interfaces
         int TotalAchievementCount { get; }
     }
 }
+

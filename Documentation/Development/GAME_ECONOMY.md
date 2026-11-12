@@ -114,3 +114,4 @@ $$\text{XP}_{\text{delta}}(L) = \text{round}\left(500 \cdot L^{1.25} + 250 \cdot
 1. **Local Authoritative vs. Cloud Authoritative:** All wallet balances and transaction ledgers currently operate locally through `SaveManager` with Schema v2 integrity checksums. Stage 4 will connect these interfaces to a backend authoritative ledger.
 2. **Anti-Cheat Boundaries:** Client-side monotonic time checks prevent trivial local system clock rolling. However, full financial cheat-proofing will require server receipt validation (Google Play Billing) when IAP is introduced in Stage 4.
 3. **Offline Leaderboards:** Leaderboard rankings represent local device records. No simulated online bot profiles are generated to deceive the player.
+

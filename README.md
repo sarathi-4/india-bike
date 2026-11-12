@@ -20,6 +20,11 @@ Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation
 - **Stage 3 (Parts 24–25)**: Missions, Progression & Rewards.
   - **Part 24**: Data-Driven Mission System supporting 15 categories, 5 difficulty tiers (Beginner to Expert), variable objectives, countdown timers, checkpoint triggers, off-route/damage failure conditions, and daily/weekly challenge managers.
   - **Part 25**: Virtual Economy (Silver & Gold Coins), non-linear XP curve, 7-day consecutive login calendar with anti-cheat clock detection, 8 milestone achievement categories, and local leaderboard ranking cache.
+- **Stage 4 (Parts 26–29)**: Multiplayer, Social & Backend.
+  - **Part 26**: 4-Player Private Multiplayer Rooms, alphanumeric 6-character room codes, host migration, 15–20 Hz state snapshot broadcast, dead reckoning, client interpolation, and anti-teleport / speedhack validation ($>48\text{ m/s}$ rejected).
+  - **Part 27**: Social Profiles (Public, FriendsOnly, Private), friend request lifecycle with spam prevention and blocklists, Riding Clubs with member hierarchy (Leader, Officer, Member), and scheduled group rides with meetup points and RSVPs.
+  - **Part 28**: In-game communication with 8 authentic Indian Quick Chat riding phrases, client-side profanity regex filtering, rate limiting (max 2 msgs/sec), player mute/report managers, and Vivox-compatible voice chat abstraction with Android mic permission handling.
+  - **Part 29**: Cloud backend supporting 16 Firestore/document collections, guest device ID auth, salted SHA256 email registration/login, account deletion GDPR compliance, cloud saves with timestamp conflict resolution, 50-action FIFO offline sync queue, and transaction HMAC-SHA256 signature verification.
 
 ---
 
@@ -49,7 +54,7 @@ Configured in `EditorBuildSettings.asset`:
 [0] Assets/Scenes/Boot.unity              - Engine Bootstrap & Service Registration
 [1] Assets/Scenes/Loading.unity           - Asynchronous Loading Screen & Indian Riding Tips
 [2] Assets/Scenes/MainMenu.unity          - Stage 1 Development & Audio/Save Dashboard
-[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2 & 3 Playable Regional Riding Environment
+[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2, 3 & 4 Playable Environment with Multiplayer & Backend
 ```
 
 ---
@@ -59,10 +64,13 @@ Configured in `EditorBuildSettings.asset`:
 1. Open **Unity Hub** and select **Add > Add project from disk**.
 2. Select the repository root folder (`indianbike`).
 3. Open with **Unity 2022.3 LTS** with Android Build Support installed.
-4. **Running the Regional Test Scene (Stage 2 & 3)**:
+4. **Running the Regional Test Scene (Stage 2, 3 & 4)**:
    - In Unity Project view, open `Assets/Scenes/RegionalRideTest.unity`.
    - Press **Play**.
-   - Use the on-screen **Stage 2 & 3 System Controls** panel:
+   - Use the on-screen **Stage 2, 3 & 4 System Controls** panel:
+     - **Multiplayer Controls**: Host a 4-player room, join with room code, toggle Ready status, simulate network ride.
+     - **Communication Controls**: Trigger Quick Chat phrases (*"Horn OK Please!"*, *"Fuel stop at the Dhaba!"*), toggle mic state.
+     - **Backend & Cloud**: Authenticate as Guest, trigger cloud sync, test offline transaction queuing.
      - **Mission Controls**: Start sample Highway or Village missions, complete or fail active missions.
      - **Economy & Progression**: Credit +500 Silver, spend 200 Silver, add +350 XP, claim daily streak rewards.
      - **Mount / Dismount Passenger**: Observe procedural leaning into turns and seat positioning.
@@ -79,13 +87,16 @@ Configured in `EditorBuildSettings.asset`:
 ### Unity Test Runner:
 1. In the Unity Editor menu, select **Window > General > Test Runner**.
 2. Under the **EditMode** tab, click **Run All**.
-3. All test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, Weather, MissionSystem, and Economy will execute and pass.
+3. All test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, Weather, MissionSystem, Economy, Multiplayer, Social, Communication, and Backend will execute and pass.
 
 ### CLI Verification Suites:
 ```bash
-# 1. Master Architectural Verification Suite (184 C# files, 377 assets)
-python3 Tools/Verification/test_stage3_architecture.py
+# 1. Master Architectural Verification Suite (228 C# files, 438 assets)
+python3 Tools/Verification/test_stage4_architecture.py
 
-# 2. Functional Simulation Test Runner (18 of 18 Tests)
+# 2. Stage 4 Functional Simulation Test Runner (22 of 22 Tests)
+python3 Tools/Verification/run_stage4_simulation_tests.py
+
+# 3. Stage 3 Functional Simulation Test Runner (18 of 18 Tests)
 python3 Tools/Verification/run_stage3_simulation_tests.py
 ```

@@ -160,3 +160,4 @@ The mission catalogue supports 15 distinct gameplay styles modeled across Indian
   - Transfers `playerProfile.playerCoins` to `progression.silverCoins`.
   - Retains `playerProfile.playerLevel` and `completedMissionIds`.
   - Re-computes checksum hash across updated fields to protect file integrity.
+

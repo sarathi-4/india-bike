@@ -87,3 +87,4 @@ namespace IndianBikeLife.MissionSystem
         public float NormalizedProgress => targetValue > 0f ? Mathf.Clamp01(currentProgress / targetValue) : 0f;
     }
 }
+
