@@ -36,3 +36,4 @@ namespace IndianBikeLife.Core.Interfaces
         void SetSeason(IndianSeason season);
     }
 }
+

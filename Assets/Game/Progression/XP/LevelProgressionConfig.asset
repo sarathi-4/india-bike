@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4349bbe754f2ace794f5abee6b1bd835, type: 3}
+  m_Name: LevelProgressionConfig
+  _baseXP: 500
+  _exponent: 1.25
+  _flatPerLevel: 250
+  _maxLevel: 50
+  _unlocks:
+  - level: 2
+    unlockType: 1
+    unlockId: CityRide
+    title: City Riding Mode
+    description: Master urban traffic and intersections
+  - level: 5
+    unlockType: 0
+    unlockId: Cruiser
+    title: Cruiser Motorcycle Tier
+    description: Unlock Royal Enfield 350cc Cruiser Class
+  - level: 10
+    unlockType: 1
+    unlockId: GhatRoadRide
+    title: Ghat Road Ride
+    description: Unlock Western Ghats Mountain Passes

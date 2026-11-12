@@ -38,3 +38,4 @@ namespace IndianBikeLife.MapSystem
         public IReadOnlyList<DistrictData> Districts => _districts;
     }
 }
+

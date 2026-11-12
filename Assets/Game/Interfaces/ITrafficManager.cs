@@ -24,3 +24,4 @@ namespace IndianBikeLife.Core.Interfaces
         void ClearAllTraffic();
     }
 }
+

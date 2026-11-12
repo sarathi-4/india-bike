@@ -105,3 +105,4 @@ In `RegionalRideTest.unity`, a composite regional road segment is fully rideable
 
 - **Streaming OpenStreetMap GeoJSON**: Procedural road mesh generation from licensed GeoJSON vectors.
 - **Additive Scene Chunks**: As the player travels from Chennai to Ooty, intermediate districts will stream in via `MapStreamingManager`.
+

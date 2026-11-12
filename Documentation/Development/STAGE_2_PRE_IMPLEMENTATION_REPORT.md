@@ -142,3 +142,4 @@ Assets/Game/
 ## 6. Implementation Readiness
 
 The Stage 1 architecture cleanly supports all Stage 2 requirements. Implementation will proceed part by part, culminating in the functional regional test scene `RegionalRideTest.unity`.
+

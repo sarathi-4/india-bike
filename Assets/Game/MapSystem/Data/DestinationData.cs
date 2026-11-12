@@ -49,3 +49,4 @@ namespace IndianBikeLife.MapSystem
         public string RecommendedBikes => _recommendedBikes;
     }
 }
+

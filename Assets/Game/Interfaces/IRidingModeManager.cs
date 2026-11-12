@@ -16,3 +16,4 @@ namespace IndianBikeLife.Core.Interfaces
         void ApplyActiveModeSettings();
     }
 }
+

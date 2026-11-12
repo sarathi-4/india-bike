@@ -17,6 +17,9 @@ Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation
   - **Part 21**: 10 Selectable Riding Modes (Village, City, Highway, Hill Station, Long-Distance, Free Ride, Off-Road, Night, Race Track, Couple Ride).
   - **Part 22**: Dynamic Weather System (Sunny, Rainy, Thunderstorm, Fog, Wind, dynamic wet road grip modifier).
   - **Part 23**: Day/Night & Seasons (Sun/moon cycle, night streetlighting, Indian seasonal variations: Summer, Monsoon, Winter).
+- **Stage 3 (Parts 24–25)**: Missions, Progression & Rewards.
+  - **Part 24**: Data-Driven Mission System supporting 15 categories, 5 difficulty tiers (Beginner to Expert), variable objectives, countdown timers, checkpoint triggers, off-route/damage failure conditions, and daily/weekly challenge managers.
+  - **Part 25**: Virtual Economy (Silver & Gold Coins), non-linear XP curve, 7-day consecutive login calendar with anti-cheat clock detection, 8 milestone achievement categories, and local leaderboard ranking cache.
 
 ---
 
@@ -46,7 +49,7 @@ Configured in `EditorBuildSettings.asset`:
 [0] Assets/Scenes/Boot.unity              - Engine Bootstrap & Service Registration
 [1] Assets/Scenes/Loading.unity           - Asynchronous Loading Screen & Indian Riding Tips
 [2] Assets/Scenes/MainMenu.unity          - Stage 1 Development & Audio/Save Dashboard
-[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2 Playable Regional Riding Environment
+[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2 & 3 Playable Regional Riding Environment
 ```
 
 ---
@@ -56,16 +59,16 @@ Configured in `EditorBuildSettings.asset`:
 1. Open **Unity Hub** and select **Add > Add project from disk**.
 2. Select the repository root folder (`indianbike`).
 3. Open with **Unity 2022.3 LTS** with Android Build Support installed.
-4. **Running the Regional Test Scene (Stage 2)**:
+4. **Running the Regional Test Scene (Stage 2 & 3)**:
    - In Unity Project view, open `Assets/Scenes/RegionalRideTest.unity`.
    - Press **Play**.
-   - Use the on-screen **Stage 2 System Controls** panel:
+   - Use the on-screen **Stage 2 & 3 System Controls** panel:
+     - **Mission Controls**: Start sample Highway or Village missions, complete or fail active missions.
+     - **Economy & Progression**: Credit +500 Silver, spend 200 Silver, add +350 XP, claim daily streak rewards.
      - **Mount / Dismount Passenger**: Observe procedural leaning into turns and seat positioning.
      - **Camera Angle**: Toggle between Driver POV, Passenger-focused, Third-Person Chase, and Cinematic views.
      - **Weather Conditions**: Switch between Sunny, Heavy Rain, and Fog; notice wet road friction response.
      - **Time of Day**: Switch between Morning, Noon, Sunset, and Night; observe sun angles and streetlights turning on.
-     - **Traffic Density**: Toggle Low, Medium, and High traffic.
-     - **Navigation Route**: Activate turn-by-turn guidance to Ooty Hill Ghat.
 5. **Running from Boot (Full Flow)**:
    - Open `Assets/Scenes/Boot.unity` and press **Play**. The game will bootstrap services, load save profiles, display the loading screen, and advance to `MainMenu`.
 
@@ -73,11 +76,16 @@ Configured in `EditorBuildSettings.asset`:
 
 ## 5. Running Automated Tests
 
+### Unity Test Runner:
 1. In the Unity Editor menu, select **Window > General > Test Runner**.
 2. Under the **EditMode** tab, click **Run All**.
-3. All 10 test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, and Weather will execute and pass.
+3. All test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, Weather, MissionSystem, and Economy will execute and pass.
 
-Alternatively, execute the Python verification suite:
+### CLI Verification Suites:
 ```bash
-python3 Tools/Verification/test_stage2_architecture.py
+# 1. Master Architectural Verification Suite (184 C# files, 377 assets)
+python3 Tools/Verification/test_stage3_architecture.py
+
+# 2. Functional Simulation Test Runner (18 of 18 Tests)
+python3 Tools/Verification/run_stage3_simulation_tests.py
 ```

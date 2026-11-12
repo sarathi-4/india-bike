@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9960c512819186825681f08ac9624eda, type: 3}
+  m_Name: Mission_06_TemplePillionEscort
+  _missionId: Mission_06_TemplePillionEscort
+  _title: Temple Pillion Escort
+  _description: "Carefully transport a passenger to the hilltop temple without sharp sudden jerks."
+  _category: 5
+  _baseDifficulty: 1
+  _requiredPlayerLevel: 2
+  _startLocationName: Starting Point
+  _startPosition: {x: 0, y: 0, z: 0}
+  _destinationName: Destination
+  _destinationPosition: {x: 0, y: 0, z: 500}
+  _requiredBikeCategory: 0
+  _passengerRequirement: 2
+  _timeLimitSeconds: 160.0
+  _failureConfig:
+    failOnTimeExpired: 1
+    failOnOffRoute: 1
+    failOnPassengerDismount: 1
+    failOnExcessiveDamage: 1
+    maxAllowedDamagePercent: 100
+    offRouteTimeoutSeconds: 15
+  _objectives:
+  - objectiveId: obj_dest
+    type: 0
+    description: Reach the final destination
+    targetValue: 1
+    currentProgress: 0
+    isCompleted: 0
+    isOptional: 0
+  - objectiveId: obj_checkpoints
+    type: 1
+    description: Pass through all intermediate checkpoints
+    targetValue: 4
+    currentProgress: 0
+    isCompleted: 0
+    isOptional: 0
+  _checkpoints:
+  - checkpointIndex: 0
+    position: {x: 0, y: 0, z: 100}
+    triggerRadius: 8
+    instructionText: Checkpoint 1
+  - checkpointIndex: 1
+    position: {x: 5, y: 0, z: 220}
+    triggerRadius: 8
+    instructionText: Checkpoint 2
+  - checkpointIndex: 2
+    position: {x: -5, y: 0, z: 360}
+    triggerRadius: 8
+    instructionText: Checkpoint 3
+  - checkpointIndex: 3
+    position: {x: 0, y: 0, z: 500}
+    triggerRadius: 8
+    instructionText: Destination Checkpoint
+  _reward: {fileID: 0}

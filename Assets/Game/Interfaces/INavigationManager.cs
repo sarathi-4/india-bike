@@ -21,3 +21,4 @@ namespace IndianBikeLife.Core.Interfaces
         void AdvanceCheckpoint(int checkpointIndex);
     }
 }
+

@@ -20,3 +20,4 @@ namespace IndianBikeLife.MapSystem
         public IReadOnlyList<DestinationData> Destinations => _destinations;
     }
 }
+

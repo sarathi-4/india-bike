@@ -10,12 +10,13 @@ namespace IndianBikeLife.Core.SaveSystem.Data
     [Serializable]
     public class SaveData
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         public int schemaVersion = CurrentSchemaVersion;
         public string saveTimestampUtc;
         public SettingsSaveData settings;
         public PlayerProfileSaveData playerProfile;
+        public ProgressionSaveData progression;
         public string checksum;
 
         public static SaveData CreateDefault()
@@ -26,6 +27,7 @@ namespace IndianBikeLife.Core.SaveSystem.Data
                 saveTimestampUtc = DateTime.UtcNow.ToString("o"),
                 settings = SettingsSaveData.CreateDefault(),
                 playerProfile = PlayerProfileSaveData.CreateDefault(),
+                progression = ProgressionSaveData.CreateDefault(),
                 checksum = string.Empty
             };
         }
@@ -46,6 +48,12 @@ namespace IndianBikeLife.Core.SaveSystem.Data
             {
                 hash = hash * 31 + (playerProfile.playerId?.GetHashCode() ?? 0);
                 hash = hash * 31 + playerProfile.playerCoins.GetHashCode();
+            }
+            if (progression != null)
+            {
+                hash = hash * 31 + progression.silverCoins.GetHashCode();
+                hash = hash * 31 + progression.goldCoins.GetHashCode();
+                hash = hash * 31 + progression.currentLevel.GetHashCode();
             }
             return hash.ToString("X8");
         }

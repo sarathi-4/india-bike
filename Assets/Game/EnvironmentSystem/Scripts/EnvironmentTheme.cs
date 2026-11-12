@@ -13,3 +13,4 @@ namespace IndianBikeLife.EnvironmentSystem
         CoastalBeach = 5         // Coconut palms, fishing boats, coastal highway barriers, sand banks
     }
 }
+

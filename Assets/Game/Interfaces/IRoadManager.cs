@@ -18,3 +18,4 @@ namespace IndianBikeLife.Core.Interfaces
         Vector3 GetNearestRoadPoint(Vector3 worldPosition, out Vector3 forwardDirection);
     }
 }
+

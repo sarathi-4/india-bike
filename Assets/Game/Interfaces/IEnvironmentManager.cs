@@ -15,3 +15,4 @@ namespace IndianBikeLife.Core.Interfaces
         void ClearEnvironment();
     }
 }
+

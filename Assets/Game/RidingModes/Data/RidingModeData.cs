@@ -45,3 +45,4 @@ namespace IndianBikeLife.RidingModes
         public bool IsImplementedInStage2 => _isImplementedInStage2;
     }
 }
+

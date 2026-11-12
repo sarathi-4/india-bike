@@ -18,3 +18,4 @@ namespace IndianBikeLife.MapSystem
         public IReadOnlyList<CityData> Cities => _cities;
     }
 }
+

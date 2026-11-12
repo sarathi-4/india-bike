@@ -23,3 +23,4 @@ namespace IndianBikeLife.Core.Interfaces
         IReadOnlyList<string> GetFavouriteDestinations();
     }
 }
+

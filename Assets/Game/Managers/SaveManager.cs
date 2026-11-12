@@ -41,6 +41,9 @@ namespace IndianBikeLife.Core.Managers
             _saveFilePath = Path.Combine(Application.persistentDataPath, SaveFileName);
             _serializer = new JsonSaveSerializer(prettyPrint: true);
 
+            // Register schema migrators
+            _migrationManager.RegisterMigrator(new SaveMigratorV1ToV2());
+
             GameLogger.I(Tag, $"Initializing Save System. Path: {_saveFilePath}");
 
             // Load existing data or generate fresh defaults

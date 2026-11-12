@@ -17,3 +17,4 @@ namespace IndianBikeLife.RidingModes
         CoupleRide = 9          // Romantic scenic ride with passenger integration
     }
 }
+

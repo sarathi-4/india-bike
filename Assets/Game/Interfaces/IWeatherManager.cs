@@ -28,3 +28,4 @@ namespace IndianBikeLife.Core.Interfaces
         void SetIntensity(float intensity);
     }
 }
+

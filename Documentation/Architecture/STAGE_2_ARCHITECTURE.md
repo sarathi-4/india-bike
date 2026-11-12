@@ -152,3 +152,4 @@ Integrates all Stage 2 components into an interactive regional test environment 
 - Elevated curved hill-road section with banking.
 - Player motorcycle with passenger seat anchors and mount controller.
 - Interactive `RegionalRideTestHUD` allowing live switching of passengers, camera perspectives, weather conditions, time of day, and traffic density.
+
