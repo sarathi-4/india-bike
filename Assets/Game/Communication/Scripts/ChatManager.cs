@@ -179,6 +179,8 @@ namespace IndianBikeLife.Communication
             if (string.IsNullOrEmpty(text)) return string.Empty;
             return _profanityFilter.Replace(text, "***");
         }
+
+        public string FilterProfanity(string text) => SanitizeMessage(text);
     }
 }
 

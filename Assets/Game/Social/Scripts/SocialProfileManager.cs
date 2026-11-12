@@ -18,6 +18,30 @@ namespace IndianBikeLife.Social
             _localProfile = new SocialProfileData(playerId, playerName);
         }
 
+        public void UpdateLocalProfile(SocialProfileData profile)
+        {
+            _localProfile = profile;
+            CacheRemoteProfile(profile);
+        }
+
+        public SocialProfileData GetSanitizedProfile(string playerId, bool isFriend)
+        {
+            var profile = GetProfile(playerId);
+            if (profile == null) return null;
+
+            if (profile.privacy == ProfilePrivacy.Private || (!isFriend && profile.privacy == ProfilePrivacy.FriendsOnly))
+            {
+                return new SocialProfileData(profile.playerId, profile.username)
+                {
+                    bio = "Hidden by privacy settings.",
+                    level = 0,
+                    distanceRiddenMeters = 0
+                };
+            }
+
+            return profile;
+        }
+
         public void UpdateProfile(string displayName, string avatarId, string bio, ProfilePrivacy privacy)
         {
             if (_localProfile == null) return;

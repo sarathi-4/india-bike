@@ -16,6 +16,18 @@ namespace IndianBikeLife.Social
         public List<string> invitedPlayerIds = new List<string>();
         public List<string> confirmedPlayerIds = new List<string>();
 
+        public string destinationLocation
+        {
+            get => destinationName;
+            set => destinationName = value;
+        }
+
+        public List<string> rsvpPlayerIds
+        {
+            get => confirmedPlayerIds;
+            set => confirmedPlayerIds = value;
+        }
+
         public GroupRidePlan() { }
 
         public GroupRidePlan(string id, string title, string dest, Vector3 meet)
@@ -49,6 +61,15 @@ namespace IndianBikeLife.Social
             GameLogger.I(Tag, $"Created group ride plan '{title}' towards {destination}");
             return plan;
         }
+
+        public GroupRidePlan ScheduleRide(string title, string destination, string meetingPoint, string scheduledTimeUtc, string creatorId, string creatorName)
+        {
+            var plan = CreateRidePlan(title, destination, Vector3.zero, creatorId);
+            plan.scheduledTimeUtc = scheduledTimeUtc;
+            return plan;
+        }
+
+        public bool RSVPToRide(string rideId, string playerId) => ConfirmAttendance(rideId, playerId);
 
         public bool ConfirmAttendance(string rideId, string playerId)
         {

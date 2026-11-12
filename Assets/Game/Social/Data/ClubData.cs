@@ -59,6 +59,14 @@ namespace IndianBikeLife.Social
         }
 
         public bool IsMember(string playerId) => members.Exists(m => m.playerId == playerId);
+
+        public bool UpdateMemberRole(string playerId, ClubMemberRole newRole)
+        {
+            var member = members.Find(m => m.playerId == playerId);
+            if (member == null) return false;
+            member.role = newRole;
+            return true;
+        }
     }
 }
 

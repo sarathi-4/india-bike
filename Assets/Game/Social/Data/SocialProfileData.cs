@@ -9,6 +9,13 @@ namespace IndianBikeLife.Social
         Private
     }
 
+    public enum ProfilePrivacyLevel
+    {
+        Public,
+        FriendsOnly,
+        Private
+    }
+
     /// <summary>
     /// Player social profile containing level, motorcycle ownership, stats, and privacy settings.
     /// </summary>
@@ -29,12 +36,39 @@ namespace IndianBikeLife.Social
         public bool isOnline = true;
         public ProfilePrivacy privacy = ProfilePrivacy.Public;
 
+        public ProfilePrivacyLevel privacyLevel
+        {
+            get => (ProfilePrivacyLevel)privacy;
+            set => privacy = (ProfilePrivacy)value;
+        }
+
+        public int level
+        {
+            get => playerLevel;
+            set => playerLevel = value;
+        }
+
+        public float distanceRiddenMeters
+        {
+            get => totalDistanceDrivenKm * 1000f;
+            set => totalDistanceDrivenKm = value / 1000f;
+        }
+
         public SocialProfileData() { }
 
         public SocialProfileData(string pid, string name)
         {
             playerId = pid;
             username = name;
+        }
+
+        public SocialProfileData(string pid, string name, string motorcycle, int lvl, float distMeters)
+        {
+            playerId = pid;
+            username = name;
+            selectedMotorcycleId = motorcycle;
+            playerLevel = lvl;
+            totalDistanceDrivenKm = distMeters / 1000f;
         }
     }
 }

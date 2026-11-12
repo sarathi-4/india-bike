@@ -38,6 +38,7 @@ namespace IndianBikeLife.Social
         public string fromPlayerId;
         public string fromPlayerName;
         public string timestampUtc;
+        public string message;
         public FriendRequestStatus status;
 
         public FriendRequest() { }
@@ -47,6 +48,17 @@ namespace IndianBikeLife.Social
             requestId = reqId;
             fromPlayerId = fromId;
             fromPlayerName = fromName;
+            message = "";
+            timestampUtc = DateTime.UtcNow.ToString("o");
+            status = FriendRequestStatus.Pending;
+        }
+
+        public FriendRequest(string reqId, string fromId, string fromName, string msg)
+        {
+            requestId = reqId;
+            fromPlayerId = fromId;
+            fromPlayerName = fromName;
+            message = msg;
             timestampUtc = DateTime.UtcNow.ToString("o");
             status = FriendRequestStatus.Pending;
         }
