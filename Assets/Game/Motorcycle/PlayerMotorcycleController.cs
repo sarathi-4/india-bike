@@ -306,7 +306,7 @@ namespace IndianBikeLife.Motorcycle
             _currentBikeModelName = modelName;
             _topSpeedKmh = topSpeed;
             _accelerationRate = acceleration;
-            _brakeForce = brakePower;
+            _brakePower = brakePower;
         }
 
         public void BindVisualAnchors(Transform chassis, Transform fork, Transform fWheel, Transform rWheel, Light headlight, Transform seat)

@@ -376,7 +376,7 @@ namespace IndianBikeLife.Core.UI
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Stage 1 Engine Tune (+10 km/h) [₹ 500 Silver]", GUILayout.Height(30)))
             {
-                if (_economyManager != null && _economyManager.Debit(CurrencyType.SilverCoins, 500, out _))
+                if (_economyManager != null && _economyManager.SpendCurrency(CurrencyType.SilverCoins, 500, "Stage 1 Engine Tune"))
                 {
                     _bikeTopSpeeds[_selectedBikeIndex] += 10f;
                     ApplyCustomizationsToBike();
@@ -384,7 +384,7 @@ namespace IndianBikeLife.Core.UI
             }
             if (GUILayout.Button("Ceramic Disc Brakes [₹ 300 Silver]", GUILayout.Height(30)))
             {
-                if (_economyManager != null && _economyManager.Debit(CurrencyType.SilverCoins, 300, out _))
+                if (_economyManager != null && _economyManager.SpendCurrency(CurrencyType.SilverCoins, 300, "Ceramic Disc Brakes"))
                 {
                     ApplyCustomizationsToBike();
                 }
@@ -480,7 +480,7 @@ namespace IndianBikeLife.Core.UI
                 }
                 else if (_economyManager != null)
                 {
-                    _economyManager.Credit(CurrencyType.SilverCoins, 500, out _);
+                    _economyManager.AddCurrency(CurrencyType.SilverCoins, 500, "Daily Login Reward");
                 }
             }
 
@@ -539,3 +539,4 @@ namespace IndianBikeLife.Core.UI
         }
     }
 }
+
