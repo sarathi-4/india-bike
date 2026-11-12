@@ -132,6 +132,8 @@ namespace IndianBikeLife.Core.Services
                 _services.Clear();
             }
         }
+
+        public static void Clear() => Reset();
     }
 }
 

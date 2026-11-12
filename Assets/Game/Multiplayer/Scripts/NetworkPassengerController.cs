@@ -41,6 +41,19 @@ namespace IndianBikeLife.Multiplayer
                 _passengerModel.transform.localRotation = Quaternion.Euler(0f, 0f, -_currentPassengerRoll);
             }
         }
+
+        public bool HasPassenger => _passengerModel != null && _passengerModel.activeSelf;
+        public float PassengerLeanRoll => _currentPassengerRoll;
+
+        public void ApplyPassengerState(bool hasPassenger, float passengerLeanRoll)
+        {
+            _currentPassengerRoll = passengerLeanRoll;
+            if (_passengerModel != null)
+            {
+                _passengerModel.SetActive(hasPassenger);
+                _passengerModel.transform.localRotation = Quaternion.Euler(0f, 0f, -passengerLeanRoll);
+            }
+        }
     }
 }
 

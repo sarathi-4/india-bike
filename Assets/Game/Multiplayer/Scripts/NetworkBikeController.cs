@@ -52,6 +52,19 @@ namespace IndianBikeLife.Multiplayer
                 _hornAudioSource.Play();
             }
         }
+
+        public float SteerAngle => _playerController != null ? _playerController.LatestState.steerAngle : 0f;
+        public float LeanRoll => _currentLeanRoll;
+        public bool HeadlightOn => _headlight != null && _headlight.enabled;
+        public bool HornHonking => _playerController != null && _playerController.LatestState.hornHonking;
+
+        public void ApplyRemoteState(float steerAngle, float leanRoll, bool headlight, bool horn)
+        {
+            _currentLeanRoll = leanRoll;
+            if (_bikeBodyTransform != null) _bikeBodyTransform.localRotation = Quaternion.Euler(0f, 0f, -leanRoll);
+            if (_frontForkTransform != null) _frontForkTransform.localRotation = Quaternion.Euler(0f, steerAngle, 0f);
+            if (_headlight != null) _headlight.enabled = headlight;
+        }
     }
 }
 
