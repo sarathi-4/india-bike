@@ -27,3 +27,4 @@ namespace IndianBikeLife.Backend
         public bool EnableOfflineMockMode => _enableOfflineMockMode;
     }
 }
+

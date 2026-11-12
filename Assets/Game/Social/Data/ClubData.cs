@@ -61,3 +61,4 @@ namespace IndianBikeLife.Social
         public bool IsMember(string playerId) => members.Exists(m => m.playerId == playerId);
     }
 }
+

@@ -70,3 +70,4 @@ sequenceDiagram
     Cloud-->>OSM: Batch confirmed (200 OK)
     OSM->>OSM: Clear flushed actions
 ```
+

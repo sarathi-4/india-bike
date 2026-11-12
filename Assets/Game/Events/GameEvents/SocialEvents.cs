@@ -39,3 +39,4 @@ namespace IndianBikeLife.Core.Events.GameEvents
         public ClubLeftEvent(string cid) => ClubId = cid;
     }
 }
+

@@ -35,3 +35,4 @@ namespace IndianBikeLife.Core.Interfaces
         event Action<ClubData> OnClubUpdated;
     }
 }
+

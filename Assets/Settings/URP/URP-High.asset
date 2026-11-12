@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2e1d4903883e64cb5dd54f76ca5b32, type: 3}
+  m_Name: URP-High
+  m_RendererDataList:
+  - {fileID: 11400000, guid: c0000000000000000000000000000005, type: 2}
+  m_DefaultRendererIndex: 0
+  m_SupportsCameraDepthTexture: 1
+  m_SupportsCameraOpaqueTexture: 1
+  m_OpaqueDownsampling: 1
+  m_SupportsTerrainHoles: 0
+  m_SupportsHDR: 1
+  m_MSAA: 4
+  m_RenderScale: 1
+  m_MainLightRenderingMode: 1
+  m_MainLightShadowsSupported: 1
+  m_MainLightShadowmapResolution: 2048
+  m_AdditionalLightsRenderingMode: 1
+  m_AdditionalLightsShadowsSupported: 1
+  m_ShadowDistance: 80
+  m_ShadowCascadeCount: 4

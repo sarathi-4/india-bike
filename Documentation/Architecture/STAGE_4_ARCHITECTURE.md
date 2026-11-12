@@ -192,3 +192,4 @@ graph TD
 ### 5.4 Offline Sync & Security
 - `OfflineSyncManager`: Buffers up to 50 operations in a FIFO queue when offline; automatically flushes upon reconnect.
 - `PlayerDataManager`: Validates critical economy credits using HMAC-SHA256 signatures (`TokenSecurityUtility.ComputeHmac`), rejecting client-side coin tampering.
+

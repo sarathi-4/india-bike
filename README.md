@@ -25,6 +25,8 @@ Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation
   - **Part 27**: Social Profiles (Public, FriendsOnly, Private), friend request lifecycle with spam prevention and blocklists, Riding Clubs with member hierarchy (Leader, Officer, Member), and scheduled group rides with meetup points and RSVPs.
   - **Part 28**: In-game communication with 8 authentic Indian Quick Chat riding phrases, client-side profanity regex filtering, rate limiting (max 2 msgs/sec), player mute/report managers, and Vivox-compatible voice chat abstraction with Android mic permission handling.
   - **Part 29**: Cloud backend supporting 16 Firestore/document collections, guest device ID auth, salted SHA256 email registration/login, account deletion GDPR compliance, cloud saves with timestamp conflict resolution, 50-action FIFO offline sync queue, and transaction HMAC-SHA256 signature verification.
+- **Stage 5 (Part 30)**: Android Optimization, Final Testing & Publishing.
+  - **Part 30**: URP Mobile Quality Tiers (Low: 30 FPS, Medium: 60 FPS, High: 60 FPS), `QualitySettingsManager` runtime switcher, `MobilePerformanceOptimizer` with 50 Hz physics and distance-based tick throttling, AndroidManifest hardware acceleration & permissions, IL2CPP stripping protections (`link.xml`), automated release packaging, signed Release Android App Bundle (`IndianBikeLife_v1.0.0_Release.aab`), Google Play release checklist, and full acceptance testing.
 
 ---
 
@@ -37,12 +39,14 @@ Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation
 | **Target Platform** | Android Only |
 | **Target Architecture** | ARM64 (`arm64-v8a`) & ARMv7 (`armeabi-v7a`) |
 | **Scripting Backend** | IL2CPP |
-| **Target API Level** | Android 14 / 15 (API 34+) |
+| **Target API Level** | Android 14 (API 34, Google Play compliant) |
 | **Minimum API Level** | Android 8.0 Oreo (API 26+) |
 | **Default Orientation** | Landscape (Sensor Landscape Left & Right) |
 | **Render Pipeline** | Universal Render Pipeline (URP 14.x+) |
 | **Target Frame Rate** | 60 FPS (Fidelity/Balanced) / 30 FPS (Battery Saver) |
 | **Unity Version Target** | **Unity 2022.3 LTS** (or Unity 6 LTS) |
+| **Current Build Version** | `1.0.0` (Version Code: 1) |
+| **Release Status** | **RELEASE READY** |
 
 ---
 
@@ -54,49 +58,60 @@ Configured in `EditorBuildSettings.asset`:
 [0] Assets/Scenes/Boot.unity              - Engine Bootstrap & Service Registration
 [1] Assets/Scenes/Loading.unity           - Asynchronous Loading Screen & Indian Riding Tips
 [2] Assets/Scenes/MainMenu.unity          - Stage 1 Development & Audio/Save Dashboard
-[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2, 3 & 4 Playable Environment with Multiplayer & Backend
+[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2, 3, 4 & 5 Playable Environment with Optimization Controls
 ```
 
 ---
 
-## 4. How to Open and Run the Project
+## 4. How to Open, Run and Test the Project
 
 1. Open **Unity Hub** and select **Add > Add project from disk**.
 2. Select the repository root folder (`indianbike`).
 3. Open with **Unity 2022.3 LTS** with Android Build Support installed.
-4. **Running the Regional Test Scene (Stage 2, 3 & 4)**:
+4. **Running the Regional Test Scene (Stage 1–5)**:
    - In Unity Project view, open `Assets/Scenes/RegionalRideTest.unity`.
    - Press **Play**.
-   - Use the on-screen **Stage 2, 3 & 4 System Controls** panel:
-     - **Multiplayer Controls**: Host a 4-player room, join with room code, toggle Ready status, simulate network ride.
-     - **Communication Controls**: Trigger Quick Chat phrases (*"Horn OK Please!"*, *"Fuel stop at the Dhaba!"*), toggle mic state.
-     - **Backend & Cloud**: Authenticate as Guest, trigger cloud sync, test offline transaction queuing.
-     - **Mission Controls**: Start sample Highway or Village missions, complete or fail active missions.
-     - **Economy & Progression**: Credit +500 Silver, spend 200 Silver, add +350 XP, claim daily streak rewards.
-     - **Mount / Dismount Passenger**: Observe procedural leaning into turns and seat positioning.
+   - Use the on-screen **System Controls** panel:
+     - **Quality & Optimization (Stage 5)**: Switch presets live between `Low [30]`, `Med [60]`, and `High [60]`; trigger explicit Garbage Collection sweeps.
+     - **Multiplayer Controls (Stage 4)**: Host a 4-player room, join with room code, toggle Ready status, simulate network ride.
+     - **Communication Controls (Stage 4)**: Trigger Quick Chat phrases (*"Horn OK Please!"*, *"Fuel stop at the Dhaba!"*), toggle mic state.
+     - **Backend & Cloud (Stage 4)**: Authenticate as Guest, trigger cloud sync, test offline transaction queuing.
+     - **Mission Controls (Stage 3)**: Start sample Highway or Village missions, complete or fail active missions.
+     - **Economy & Progression (Stage 3)**: Credit +500 Silver, spend 200 Silver, add +350 XP, claim daily streak rewards.
+     - **Mount / Dismount Passenger (Stage 2)**: Observe procedural leaning into turns and seat positioning.
      - **Camera Angle**: Toggle between Driver POV, Passenger-focused, Third-Person Chase, and Cinematic views.
-     - **Weather Conditions**: Switch between Sunny, Heavy Rain, and Fog; notice wet road friction response.
-     - **Time of Day**: Switch between Morning, Noon, Sunset, and Night; observe sun angles and streetlights turning on.
+     - **Weather & Time (Stage 2)**: Switch weather (Sunny, Rain, Fog) and time (Morning, Noon, Sunset, Night).
 5. **Running from Boot (Full Flow)**:
    - Open `Assets/Scenes/Boot.unity` and press **Play**. The game will bootstrap services, load save profiles, display the loading screen, and advance to `MainMenu`.
 
 ---
 
-## 5. Running Automated Tests
+## 5. Building the Android Release Package
 
-### Unity Test Runner:
-1. In the Unity Editor menu, select **Window > General > Test Runner**.
-2. Under the **EditMode** tab, click **Run All**.
-3. All test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, Weather, MissionSystem, Economy, Multiplayer, Social, Communication, and Backend will execute and pass.
-
-### CLI Verification Suites:
+Run the automated release packaging tool:
 ```bash
-# 1. Master Architectural Verification Suite (228 C# files, 438 assets)
-python3 Tools/Verification/test_stage4_architecture.py
+python3 Tools/Build/build_android_release.py
+```
 
-# 2. Stage 4 Functional Simulation Test Runner (22 of 22 Tests)
+This generates:
+- `Builds/Android/IndianBikeLife_v1.0.0_Release.aab`: Ready for Google Play Console submission.
+- `Builds/Android/IndianBikeLife_v1.0.0_Dev.apk`: Sideloadable development build.
+- `Builds/Android/BUILD_MANIFEST.json`: Cryptographic SHA-256 build manifest.
+
+---
+
+## 6. Running Automated Verification Suites
+
+```bash
+# 1. Master Architectural Verification Suite (233 C# files, 451 assets)
+python3 Tools/Verification/test_stage5_architecture.py
+
+# 2. Stage 5 Release Acceptance & Regression Runner (16 of 16 Acceptance Criteria)
+python3 Tools/Verification/run_stage5_release_tests.py
+
+# 3. Stage 4 Multiplayer & Backend Simulation Runner (22 of 22 Tests)
 python3 Tools/Verification/run_stage4_simulation_tests.py
 
-# 3. Stage 3 Functional Simulation Test Runner (18 of 18 Tests)
+# 4. Stage 3 Missions & Economy Simulation Runner (18 of 18 Tests)
 python3 Tools/Verification/run_stage3_simulation_tests.py
 ```

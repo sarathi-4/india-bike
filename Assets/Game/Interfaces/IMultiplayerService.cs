@@ -40,3 +40,4 @@ namespace IndianBikeLife.Core.Interfaces
         event Action OnRideStarted;
     }
 }
+

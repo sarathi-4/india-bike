@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2e1d4903883e64cb5dd54f76ca5b32, type: 3}
+  m_Name: URP-Low_Renderer
+  m_RendererFeatures: []
+  m_RendererFeatureMap: 
+  m_UseNativeRenderPass: 0
+  m_DefaultStencilState:
+    m_OverrideStencilState: 0
+    m_StencilReference: 0
+    m_StencilCompareFunction: 8
+    m_PassOperation: 0
+    m_FailOperation: 0
+    m_ZFailOperation: 0
+  m_PostProcessData: {fileID: 0}
+  m_IntermediateTextureMode: 0

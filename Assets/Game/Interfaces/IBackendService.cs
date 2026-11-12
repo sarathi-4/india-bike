@@ -38,3 +38,4 @@ namespace IndianBikeLife.Core.Interfaces
         event Action<bool> OnNetworkConnectivityChanged;
     }
 }
+

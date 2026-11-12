@@ -45,3 +45,4 @@ namespace IndianBikeLife.Core.Events.GameEvents
         public MultiplayerRideStartedEvent(RoomData room) => Room = room;
     }
 }
+

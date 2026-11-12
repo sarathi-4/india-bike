@@ -31,3 +31,4 @@ namespace IndianBikeLife.Core.Interfaces
         event Action<QuickChatMessage> OnQuickChatReceived;
     }
 }
+

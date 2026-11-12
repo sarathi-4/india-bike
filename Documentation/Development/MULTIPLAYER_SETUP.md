@@ -62,3 +62,4 @@ sequenceDiagram
 - **Snapshot Frequency:** 15 Hz default (~66 ms interval).
 - **Snapshot Size:** ~60 bytes per snapshot uncompressed, resulting in $<1\text{ KB/s}$ per remote player ($<3\text{ KB/s}$ total download bandwidth for 3 remote peers).
 - **Extrapolation:** When network packets are delayed, `NetworkPlayerController` performs velocity-based dead reckoning up to 300 ms, avoiding visual stuttering.
+

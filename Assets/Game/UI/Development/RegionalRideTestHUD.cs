@@ -193,6 +193,26 @@ namespace IndianBikeLife.Core.UI.Development
             if (GUILayout.Button("Cam POV")) _cameraController?.CycleCameraView();
             GUILayout.EndHorizontal();
 
+            // 7. Stage 5: Android Quality & Optimization
+            GUILayout.Space(4);
+            GUILayout.Label("<b>7. Quality & Optimization:</b>");
+            if (ServiceLocator.TryGet<IQualityService>(out var qualityService))
+            {
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button(qualityService.CurrentPreset == IndianBikeLife.Core.Configuration.MobileQualityPreset.Low ? "[Low 30]" : "Low"))
+                    qualityService.SetQualityPreset(IndianBikeLife.Core.Configuration.MobileQualityPreset.Low);
+                if (GUILayout.Button(qualityService.CurrentPreset == IndianBikeLife.Core.Configuration.MobileQualityPreset.Medium ? "[Med 60]" : "Med"))
+                    qualityService.SetQualityPreset(IndianBikeLife.Core.Configuration.MobileQualityPreset.Medium);
+                if (GUILayout.Button(qualityService.CurrentPreset == IndianBikeLife.Core.Configuration.MobileQualityPreset.High ? "[High 60]" : "High"))
+                    qualityService.SetQualityPreset(IndianBikeLife.Core.Configuration.MobileQualityPreset.High);
+                GUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("Trigger Memory Sweep (GC)"))
+            {
+                if (ServiceLocator.TryGet<IndianBikeLife.Core.Managers.MobilePerformanceOptimizer>(out var opt))
+                    opt.TriggerSceneTransitionCleanup();
+            }
+
             GUILayout.EndArea();
 
             // Top Right Progression & Economy Telemetry

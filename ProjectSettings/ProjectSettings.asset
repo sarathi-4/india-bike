@@ -42,7 +42,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.1.0
+  bundleVersion: 1.0.0
   preloadedAssets: []
   metroInputMedium: 0
   m_XboxOneResolution: 0
@@ -107,7 +107,7 @@ PlayerSettings:
   androidKeyStorePassword: 
   androidKeyAliasName: 
   androidKeyAliasPassword: 
-  androidForceInternetPermission: 0
+  androidForceInternetPermission: 1
   androidForceSDCardPermission: 0
   androidTargetArchitectures: 3
   androidBuildApkPerCpuArchitecture: 0

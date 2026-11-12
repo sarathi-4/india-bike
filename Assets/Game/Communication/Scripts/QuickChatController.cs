@@ -31,3 +31,4 @@ namespace IndianBikeLife.Communication
         public static int PhraseCount => IndianRidingPhrases.Length;
     }
 }
+
