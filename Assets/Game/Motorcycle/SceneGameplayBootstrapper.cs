@@ -29,6 +29,12 @@ namespace IndianBikeLife.Motorcycle
 
         public void EnsureFullGameplaySetup()
         {
+            // Enforce URP pipeline
+            if (QualitySettings.renderPipeline == null && UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+            {
+                QualitySettings.renderPipeline = UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline;
+            }
+
             // 1. Locate or create Player Motorcycle
             GameObject bikeObj = GameObject.FindWithTag("Motorcycle");
             if (bikeObj == null)
@@ -112,7 +118,42 @@ namespace IndianBikeLife.Motorcycle
             bikeObj.transform.position = new Vector3(-2.2f, 0.6f, 12f);
             bikeObj.transform.rotation = Quaternion.identity;
 
+            // Heal any pink shaders in the scene
+            FixPinkMaterialsInScene();
+
             Debug.Log("[SceneGameplayBootstrapper] Full Indian Bike Life 3D Gameplay initialized successfully!");
+        }
+
+        public void FixPinkMaterialsInScene()
+        {
+            var renderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
+            foreach (var r in renderers)
+            {
+                if (r == null || r.sharedMaterial == null) continue;
+                var s = r.sharedMaterial.shader;
+                bool isPink = s == null || s.name.Contains("Error") || s.name == "Hidden/InternalErrorShader";
+
+                if (isPink)
+                {
+                    Color c = Color.gray;
+                    string n = r.gameObject.name.ToLower();
+                    if (n.Contains("asphalt") || n.Contains("road")) c = new Color(0.18f, 0.18f, 0.20f);
+                    else if (n.Contains("grass") || n.Contains("landscape")) c = new Color(0.28f, 0.45f, 0.22f);
+                    else if (n.Contains("yellow") || n.Contains("shoulder") || n.Contains("cap")) c = new Color(0.98f, 0.78f, 0.12f);
+                    else if (n.Contains("white") || n.Contains("dash") || n.Contains("base")) c = new Color(0.95f, 0.95f, 0.95f);
+                    else if (n.Contains("dhaba") || n.Contains("building")) c = new Color(0.92f, 0.82f, 0.65f);
+                    else if (n.Contains("roof")) c = new Color(0.68f, 0.22f, 0.18f);
+                    else if (n.Contains("foliage") || n.Contains("leaf") || n.Contains("tree")) c = new Color(0.18f, 0.52f, 0.18f);
+                    else if (n.Contains("trunk") || n.Contains("wood") || n.Contains("pole")) c = new Color(0.35f, 0.22f, 0.14f);
+                    else if (n.Contains("tank") || n.Contains("body") || n.Contains("fender")) c = new Color(0.72f, 0.08f, 0.12f);
+                    else if (n.Contains("engine") || n.Contains("chrome") || n.Contains("rim") || n.Contains("fork") || n.Contains("exhaust")) c = new Color(0.92f, 0.92f, 0.95f);
+                    else if (n.Contains("tyre") || n.Contains("rubber") || n.Contains("grip")) c = new Color(0.12f, 0.12f, 0.12f);
+                    else if (n.Contains("seat") || n.Contains("leather")) c = new Color(0.15f, 0.12f, 0.10f);
+
+                    r.sharedMaterial = IndianBikeLife.Core.Utilities.URPMaterialUtility.GetCachedColorMaterial(c, $"Fixed_{r.gameObject.name}");
+                }
+            }
+        }
         }
     }
 }

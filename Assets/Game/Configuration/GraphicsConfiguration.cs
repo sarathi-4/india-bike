@@ -51,6 +51,11 @@ namespace IndianBikeLife.Core.Configuration
                 QualitySettings.SetQualityLevel(qualityIndex, true);
             }
 
+            if (QualitySettings.renderPipeline == null && UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+            {
+                QualitySettings.renderPipeline = UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline;
+            }
+
             int targetFps = preset == MobileQualityPreset.Low ? _lowTargetFps :
                             preset == MobileQualityPreset.Medium ? _medTargetFps : _highTargetFps;
 
