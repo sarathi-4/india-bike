@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 using IndianBikeLife.Backend;
 using IndianBikeLife.Core.Configuration;
 using IndianBikeLife.Core.Interfaces;
@@ -17,29 +18,25 @@ namespace IndianBikeLife.Core.UI
 {
     public enum GameScreen
     {
-        SplashScreen = 1,       // 1. Splash Screen
-        MainMenu = 2,           // 2. Main Menu
-        Garage = 3,             // 3. Garage
-        IndiaMap = 4,           // 4. India Map
-        RidingHUD = 5,          // 5. Riding HUD
-        Missions = 6,           // 6. Missions
-        Multiplayer = 7,        // 7. Multiplayer
-        Settings = 8,           // 8. Settings
-        RewardScreen = 9,       // 9. Reward Screen
-        AvatarStudio = 10       // 10. Rider Avatar Customization Studio
+        WelcomeAndLogin = 0,    // 1. Welcome & Login Screen (Matches Image 1)
+        LoadingScreen = 1,      // 2. Loading Screen with Progress Bar (Matches Image 2)
+        MainMenu = 2,           // 3. Main Play Hub / Open World Menu (Matches Image 3)
+        Garage = 3,             // 4. Garage Turntable with 3D Models (Reference 3)
+        IndiaMap = 4,           // 5. India Map State Selector (Reference 4)
+        RidingHUD = 5,          // 6. In-Game 3D Riding HUD (Reference 5)
+        Missions = 6,           // 7. Missions Catalogue (Reference 6)
+        Multiplayer = 7,        // 8. Multiplayer Convoy (Reference 7)
+        Settings = 8,           // 9. Settings (Reference 8)
+        RewardScreen = 9,       // 10. Reward Screen (Reference 9)
+        AvatarStudio = 10       // 11. Rider Avatar Studio
     }
 
     /// <summary>
-    /// Master UI System strictly matching the 9-Screen Indian Bike Life Visual Design Target:
-    /// Screen 1: Splash Screen with Tricolor Indian Bike Life Logo and 85% Progress Bar
-    /// Screen 2: Main Menu with Player001, Lv.5, Wallet, Big Yellow PLAY Button and Side Navigation
-    /// Screen 3: Garage with Revolving 3D Showroom, Spec Bars (Speed, Handling, Braking, Fuel), Upgrade/Customize and Bike Carousel
-    /// Screen 4: India Map with 28 States & UTs, 3D Geographical Pin and Tamil Nadu Card (Districts: 38, Locations: 250+)
-    /// Screen 5: Riding HUD with GPS Mini-map, Speedometer (120 km/h, Gear 5), Fuel Bar, Throttle & Brake Pedals
-    /// Screen 6: Missions with Story/Daily/Weekly Tabs, Chennai Run, Rewards (500 XP, 1000 Coins) and GO buttons
-    /// Screen 7: Multiplayer with Online: 2456 Pill, Online Ride, Create Room, and Join Room Cards
-    /// Screen 8: Settings with Graphics (Ultra/High/Med/Low, 30/60 FPS, Bloom, Shadows), Audio, Controls, Language, Account
-    /// Screen 9: Reward Screen with Golden Winged "MISSION COMPLETE!", Coin Stack, Star XP, New Bike Unlocked and Continue
+    /// Master UI System strictly matching the user-provided visual targets:
+    /// - Screen 1: Welcome Screen on Game Open with Coins, Diamonds, START RIDE, Sign Up & Login Features (Image 1)
+    /// - Screen 2: Loading Screen with 75% Progress Bar, MADE IN INDIA, Tips, and TAMIL GAME STUDIO (Image 2)
+    /// - Screen 3: Play Menu with 3D Open World, Player Profile Lv.1, and Right Action Stack (Image 3)
+    /// - Complete connected Garage, India Map, 3D Riding Simulation, Missions, Multiplayer & Settings
     /// </summary>
     public class MasterGameFlowUI : MonoBehaviour
     {
@@ -47,24 +44,52 @@ namespace IndianBikeLife.Core.UI
         public static MasterGameFlowUI Instance => _instance;
 
         [Header("Active Screen State")]
-        public GameScreen CurrentScreen = GameScreen.SplashScreen;
+        public GameScreen CurrentScreen = GameScreen.WelcomeAndLogin;
         public bool IsMenuOpen
         {
             get => CurrentScreen != GameScreen.RidingHUD;
             set => CurrentScreen = value ? GameScreen.MainMenu : GameScreen.RidingHUD;
         }
 
-        // 1. Splash Screen State
-        private float _splashProgress = 0.85f;
+        // Texture Backdrops
+        private Texture2D _welcomeTex;
+        private Texture2D _loadingTex;
+        private Texture2D _mainMenuTex;
 
-        // 2. Main Menu & Profile State
-        private string _playerName = "Player001";
-        private int _playerLevel = 5;
-        private int _silverCoins = 1250;
-        private int _goldCoins = 75;
+        // 1. Welcome Screen & Auth State (Image 1)
+        private bool _showLoginModal = true;
+        private int _loginTab = 0; // 0=Sign In, 1=Create Account, 2=Guest Ride
+        private string _playerName = "Player_001";
+        private int _playerLevel = 1;
+        private int _playerXP = 0;
+        private int _silverCoins = 125750;
+        private int _diamonds = 2560;
+        private string _inputRiderName = "Player_001";
+        private string _inputEmail = "rider@indianbike.com";
+        private string _inputPassword = "********";
+        private string _authMessage = "Signed in as Player_001 (Guest Ride)";
+        private bool _rememberMe = true;
+        private bool _isAuthenticated = false;
 
-        // 3. Garage & Motorcycle State
-        private int _selectedBikeIndex = 0;
+        // 2. Loading Screen State (Image 2)
+        private float _loadingProgress = 0.05f;
+        private int _currentTipIndex = 0;
+        private readonly string[] _loadingTips = new[]
+        {
+            "💡 Tip: Use GPS to find the best route!",
+            "💡 Tip: Touch ◀ ▶ or use A / D keys to lean smoothly into sharp highway curves!",
+            "💡 Tip: Swipe or drag anywhere on the screen for full 360° camera orbit view!",
+            "💡 Tip: Switch between 6 authentic Indian motorcycles in the Garage!",
+            "💡 Tip: Enable Couple Riding to ride with a passenger across Tamil Nadu NH-44!",
+            "💡 Tip: Upgrade engine, handling and brakes in the Garage for peak top speed!"
+        };
+
+        // 3. Sound & Audio Settings (Image 3)
+        private bool _soundEnabled = true;
+        private bool _musicEnabled = true;
+
+        // 4. Garage & Motorcycle State
+        private int _selectedBikeIndex = 3; // Default to KTM 390 Duke matching reference hero
         private readonly string[] _bikeModelNames = new[]
         {
             "Yamaha R15 V4",
@@ -79,18 +104,18 @@ namespace IndianBikeLife.Core.UI
         private readonly float[] _bikeBrakings = new[] { 0.75f, 0.70f, 0.65f, 0.92f, 0.76f, 0.78f };
         private readonly float[] _bikeFuels = new[] { 0.90f, 0.85f, 0.82f, 0.75f, 0.95f, 0.80f };
 
-        private int _selectedColorIndex = 0;
+        private int _selectedColorIndex = 4; // KTM Orange
         private bool _isCoupleRiding = false;
         private readonly Color[] _bikeColors = new[]
         {
-            new Color(0.85f, 0.12f, 0.15f), // Racing Red (Yamaha/Enfield)
+            new Color(0.85f, 0.12f, 0.15f), // Racing Red
             new Color(0.12f, 0.35f, 0.85f), // Metallic Blue
             new Color(0.95f, 0.95f, 0.98f), // Pearl White
             new Color(0.12f, 0.12f, 0.15f), // Matte Black
             new Color(1.00f, 0.45f, 0.05f)  // KTM Neon Orange
         };
 
-        // 4. India Map State
+        // 5. India Map State
         private int _selectedStateIndex = 0;
         private readonly string[] _stateNames = new[]
         {
@@ -105,28 +130,55 @@ namespace IndianBikeLife.Core.UI
         };
         private readonly string[] _stateDescriptions = new[]
         {
-            "Districts: 38\nLocations: 250+\nCorridors: NH-44 Express & Ooty Ghats",
-            "Districts: 36\nLocations: 210+\nCorridors: Mumbai-Pune Expressway",
-            "Districts: 2\nLocations: 80+\nCorridors: Coastal Beach Marine Drive",
-            "Districts: 12\nLocations: 120+\nCorridors: Manali-Rohtang Snow Pass",
-            "Districts: 2\nLocations: 65+\nCorridors: Khardung La 17,582 ft High Pass",
-            "Districts: 14\nLocations: 140+\nCorridors: Munnar Tea Garden Hairpin Bends",
-            "Districts: 23\nLocations: 160+\nCorridors: Grand Trunk Road & Sher-e-Punjab",
-            "Districts: 31\nLocations: 190+\nCorridors: Bangalore-Mysore Highway"
+            "Districts: 38
+Locations: 250+
+Corridors: NH-44 Express & Ooty Ghats",
+            "Districts: 36
+Locations: 210+
+Corridors: Mumbai-Pune Expressway",
+            "Districts: 2
+Locations: 80+
+Corridors: Coastal Beach Marine Drive",
+            "Districts: 12
+Locations: 120+
+Corridors: Manali-Rohtang Snow Pass",
+            "Districts: 2
+Locations: 65+
+Corridors: Khardung La 17,582 ft High Pass",
+            "Districts: 14
+Locations: 140+
+Corridors: Munnar Tea Garden Hairpin Bends",
+            "Districts: 23
+Locations: 160+
+Corridors: Grand Trunk Road & Sher-e-Punjab",
+            "Districts: 31
+Locations: 190+
+Corridors: Bangalore-Mysore Highway"
         };
 
         // 6. Missions State
-        private int _missionTab = 0; // 0=Story, 1=Daily, 2=Weekly
+        private int _missionTab = 0;
         private bool _mission1Claimed = false;
         private bool _mission2Claimed = false;
         private bool _mission3Claimed = false;
 
-        // 7. Multiplayer & Social Invite State
+        // 7. Multiplayer State
         private string _roomCodeInput = "TN-44-ROYAL";
         private string _myGeneratedRoomCode = "TN-44-ROYAL";
         private string _multiplayerStatus = "Ready to connect to Indian Highway Convoy.";
         private bool _isRoomCodeCopied = false;
         private readonly string[] _convoyFriends = new[] { "Arun_Rider99 (Online)", "Kavitha_Bullet (Online)", "Siva_Duke390 (In-Ride)", "Vijay_Pulsar (Online)" };
+
+        // 8. Settings State
+        private int _settingsTab = 0;
+        private int _graphicsQualityIndex = 3;
+        private int _frameRateIndex = 1;
+        private bool _bloomEnabled = true;
+        private bool _shadowsEnabled = true;
+        private float _masterVolume = 1.0f;
+        private float _engineVolume = 1.0f;
+        private float _hornVolume = 1.0f;
+        private int _selectedLanguageIndex = 0;
 
         // 10. Avatar Customization State
         private bool _isFemaleAvatar = false;
@@ -138,44 +190,28 @@ namespace IndianBikeLife.Core.UI
             new Color(0.85f, 0.15f, 0.18f),
             new Color(0.12f, 0.35f, 0.82f),
             new Color(0.55f, 0.40f, 0.25f),
-            new Color(1.00f, 0.45f, 0.05f)
+            new Color(1.0f, 0.45f, 0.05f)
         };
         private int _selectedHelmetIdx = 0;
-        private readonly string[] _helmetColorNames = new[] { "Saffron Yellow", "Gloss White", "Matte Black", "Racer Red" };
+        private readonly string[] _helmetColorNames = new[] { "Saffron Gold", "Matte Black", "Pearl White", "Crimson Red" };
         private readonly Color[] _helmetColors = new[]
         {
             new Color(1.0f, 0.76f, 0.08f),
+            new Color(0.12f, 0.12f, 0.14f),
             new Color(0.95f, 0.95f, 0.98f),
-            new Color(0.12f, 0.12f, 0.15f),
             new Color(0.85f, 0.15f, 0.18f)
         };
-        private int _selectedHelmetStyle = 0; // 0=Full Face, 1=Classic Open Face, 2=Motocross Visor
+        private int _selectedHelmetStyle = 0;
 
-        // 8. Settings State
-        private int _settingsTab = 0; // 0=Graphics, 1=Audio, 2=Controls, 3=Language, 4=Account
-        private int _graphicsQualityIndex = 3; // 0=Low, 1=Med, 2=High, 3=Ultra
-        private int _frameRateIndex = 1; // 0=30 FPS, 1=60 FPS
-        private bool _bloomEnabled = true;
-        private bool _shadowsEnabled = true;
-        private float _masterVolume = 1.0f;
-        private float _engineVolume = 1.0f;
-        private float _hornVolume = 1.0f;
-        private int _selectedLanguageIndex = 0; // 0=English, 1=Tamil (தமிழ்)
-
-        // Account Auth
+        // Backend & Simulation References
         private AuthenticationManager _authManager;
-        private string _loginEmail = "demo@indianbike.com";
-        private string _loginPassword = "IndianBike2026";
-        private string _authMessage = "Signed in as Player001 (demo@indianbike.com).";
-
-        // References to 3D simulation
         private PlayerMotorcycleController _motorcycle;
         private MotorcycleVisualBuilder _visualBuilder;
         private IEconomyManager _economyManager;
         private IProgressionManager _progressionManager;
         private TimeOfDayController _timeController;
 
-        // UI Procedural Textures
+        // Procedural Textures
         private Texture2D _blueHeaderTex;
         private Texture2D _goldBtnTex;
         private Texture2D _darkPanelTex;
@@ -194,21 +230,64 @@ namespace IndianBikeLife.Core.UI
             _instance = this;
             _authManager = new AuthenticationManager();
             CreateProceduralTextures();
+            LoadArtworkTextures();
         }
 
         private void Start()
         {
             LocateSceneSystems();
             ApplyCustomizationsToBike();
-            StartCoroutine(SplashLoadingSequenceRoutine());
+
+            // Load saved rider authentication if present
+            if (PlayerPrefs.HasKey("IBL_RiderName"))
+            {
+                _playerName = PlayerPrefs.GetString("IBL_RiderName", "Player_001");
+                _inputRiderName = _playerName;
+                _isAuthenticated = true;
+                _showLoginModal = false;
+            }
+
+            // Always start on Screen 1: Welcome & Login (Image 1)
+            CurrentScreen = GameScreen.WelcomeAndLogin;
+        }
+
+        private void LoadArtworkTextures()
+        {
+            _welcomeTex = LoadTextureFile("Screen1_Welcome.jpg");
+            _loadingTex = LoadTextureFile("Screen2_Loading.jpg");
+            _mainMenuTex = LoadTextureFile("Screen3_MainMenu.jpg");
+        }
+
+        private Texture2D LoadTextureFile(string filename)
+        {
+            try
+            {
+                string fullPath = Path.Combine(Application.dataPath, "Game/UI/Textures", filename);
+                if (File.Exists(fullPath))
+                {
+                    byte[] bytes = File.ReadAllBytes(fullPath);
+                    Texture2D tex = new Texture2D(2, 2, TextureFormat.RGB24, false);
+                    if (tex.LoadImage(bytes))
+                    {
+                        tex.filterMode = FilterMode.Bilinear;
+                        tex.wrapMode = TextureWrapMode.Clamp;
+                        return tex;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[MasterGameFlowUI] Could not load texture {filename}: {e.Message}");
+            }
+            return null;
         }
 
         private void CreateProceduralTextures()
         {
             _blueHeaderTex = MakeColorTex(new Color(0.05f, 0.18f, 0.44f, 0.96f));
             _goldBtnTex = MakeColorTex(new Color(1.0f, 0.76f, 0.08f, 1.0f));
-            _darkPanelTex = MakeColorTex(new Color(0.04f, 0.09f, 0.18f, 0.90f));
-            _lightPanelTex = MakeColorTex(new Color(0.08f, 0.18f, 0.32f, 0.85f));
+            _darkPanelTex = MakeColorTex(new Color(0.04f, 0.09f, 0.18f, 0.92f));
+            _lightPanelTex = MakeColorTex(new Color(0.08f, 0.18f, 0.32f, 0.88f));
             _greenBtnTex = MakeColorTex(new Color(0.12f, 0.72f, 0.28f, 1.0f));
             _blueBtnTex = MakeColorTex(new Color(0.12f, 0.48f, 0.95f, 1.0f));
             _barFillTex = MakeColorTex(new Color(0.15f, 0.65f, 1.0f, 1.0f));
@@ -243,23 +322,47 @@ namespace IndianBikeLife.Core.UI
             if (_economyManager != null)
             {
                 _silverCoins = _economyManager.SilverCoins;
-                _goldCoins = _economyManager.GoldCoins;
             }
         }
 
-        private IEnumerator SplashLoadingSequenceRoutine()
+        public void LaunchLoadingToRide()
         {
-            _splashProgress = 0.15f;
-            yield return new WaitForSeconds(0.4f);
-            _splashProgress = 0.50f;
-            yield return new WaitForSeconds(0.5f);
-            _splashProgress = 0.85f;
-            yield return new WaitForSeconds(0.6f);
-            _splashProgress = 1.0f;
-            yield return new WaitForSeconds(0.3f);
+            StartCoroutine(LoadingSequenceRoutine(launchDirectRiding: true));
+        }
 
-            // Automatically advance to Main Menu
-            CurrentScreen = GameScreen.MainMenu;
+        public void LaunchLoadingToMenu()
+        {
+            StartCoroutine(LoadingSequenceRoutine(launchDirectRiding: false));
+        }
+
+        private IEnumerator LoadingSequenceRoutine(bool launchDirectRiding)
+        {
+            CurrentScreen = GameScreen.LoadingScreen;
+            _loadingProgress = 0.05f;
+            _currentTipIndex = UnityEngine.Random.Range(0, _loadingTips.Length);
+
+            float elapsed = 0f;
+            float duration = 1.6f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                _loadingProgress = Mathf.Clamp01(elapsed / duration);
+                yield return null;
+            }
+
+            _loadingProgress = 1.0f;
+            yield return new WaitForSeconds(0.2f);
+
+            ApplyCustomizationsToBike();
+
+            if (launchDirectRiding)
+            {
+                CurrentScreen = GameScreen.RidingHUD;
+            }
+            else
+            {
+                CurrentScreen = GameScreen.MainMenu;
+            }
         }
 
         private void Update()
@@ -270,17 +373,16 @@ namespace IndianBikeLife.Core.UI
                 {
                     CurrentScreen = GameScreen.MainMenu;
                 }
-                else if (CurrentScreen != GameScreen.SplashScreen)
+                else if (CurrentScreen != GameScreen.LoadingScreen && CurrentScreen != GameScreen.WelcomeAndLogin)
                 {
                     CurrentScreen = GameScreen.RidingHUD;
                 }
             }
 
-            // Sync live wallet
+            // Sync wallet
             if (_economyManager != null)
             {
                 _silverCoins = _economyManager.SilverCoins;
-                _goldCoins = _economyManager.GoldCoins;
             }
         }
 
@@ -301,256 +403,560 @@ namespace IndianBikeLife.Core.UI
 
             switch (CurrentScreen)
             {
-                case GameScreen.SplashScreen:
-                    DrawScreen1_Splash(w, h);
+                case GameScreen.WelcomeAndLogin:
+                    DrawScreen1_WelcomeAndLogin(w, h);
+                    break;
+
+                case GameScreen.LoadingScreen:
+                    DrawScreen2_Loading(w, h);
                     break;
 
                 case GameScreen.MainMenu:
-                    DrawScreen2_MainMenu(w, h);
+                    DrawScreen3_MainMenu(w, h);
                     break;
 
                 case GameScreen.Garage:
-                    DrawScreen3_Garage(w, h);
+                    DrawScreen4_Garage(w, h);
                     break;
 
                 case GameScreen.IndiaMap:
-                    DrawScreen4_IndiaMap(w, h);
+                    DrawScreen5_IndiaMap(w, h);
                     break;
 
                 case GameScreen.RidingHUD:
-                    DrawScreen5_RidingHUD(w, h);
+                    DrawScreen6_RidingHUD(w, h);
                     break;
 
                 case GameScreen.Missions:
-                    DrawScreen6_Missions(w, h);
+                    DrawScreen7_Missions(w, h);
                     break;
 
                 case GameScreen.Multiplayer:
-                    DrawScreen7_Multiplayer(w, h);
+                    DrawScreen8_Multiplayer(w, h);
                     break;
 
                 case GameScreen.Settings:
-                    DrawScreen8_Settings(w, h);
+                    DrawScreen9_Settings(w, h);
                     break;
 
                 case GameScreen.RewardScreen:
-                    DrawScreen9_RewardScreen(w, h);
+                    DrawScreen10_RewardScreen(w, h);
                     break;
 
                 case GameScreen.AvatarStudio:
-                    DrawScreen10_AvatarStudio(w, h);
+                    DrawScreen11_AvatarStudio(w, h);
                     break;
             }
         }
 
         // =========================================================================
-        // SCREEN 1: SPLASH SCREEN (Matches Reference 1. Splash Screen)
+        // SCREEN 1: WELCOME & LOGIN SCREEN (Matches Image 1)
         // =========================================================================
-        private void DrawScreen1_Splash(int w, int h)
+        private void DrawScreen1_WelcomeAndLogin(int w, int h)
         {
-            // Dark vignette background
+            // Draw Full Background Artwork (Image 1)
+            if (_welcomeTex != null)
+            {
+                GUI.DrawTexture(new Rect(0, 0, w, h), _welcomeTex, ScaleMode.ScaleAndCrop);
+            }
+            else
+            {
+                GUI.Box(new Rect(0, 0, w, h), "");
+            }
+
+            DrawScreenTag("1. Welcome & Login");
+
+            // Top Bar: Coins (125,750), Diamonds (2,560), Settings (⚙️), Bell (🔔)
+            DrawTopBar_Welcome(w, h);
+
+            // Left Navigation Stack (PLAY, GARAGE, SHOWROOM, MAP, MISSIONS, MULTIPLAYER)
+            DrawLeftMenu_Welcome(w, h);
+
+            // Bottom Left Navigation (PROFILE, ACHIEVEMENTS, REWARDS, WALLET)
+            DrawBottomNav_Welcome(w, h);
+
+            // Top-Right Promo Card (NEW BIKE UNLOCK NOW!)
+            DrawPromoCard_Welcome(w, h);
+
+            // Bottom-Right Giant Glowing CTA: START RIDE >>
+            DrawStartRideButton_Welcome(w, h);
+
+            // Prominent Rider Authentication Modal (Sign Up / Login / Guest)
+            if (_showLoginModal)
+            {
+                DrawLoginAndSignupModal(w, h);
+            }
+        }
+
+        private void DrawTopBar_Welcome(int w, int h)
+        {
+            float barY = 15f;
+
+            // Left: Player Profile / Auth Pill
+            GUI.DrawTexture(new Rect(20, barY, 200, 38), _darkPanelTex);
+            GUIStyle riderStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 };
+            riderStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(28, barY + 4, 150, 20), $"👤 {_playerName}", riderStyle);
+
+            GUIStyle authBtnStyle = new GUIStyle(GUI.skin.button) { fontSize = 10, fontStyle = FontStyle.Bold };
+            if (GUI.Button(new Rect(155, barY + 5, 60, 28), _isAuthenticated ? "LOGOUT" : "LOGIN", authBtnStyle))
+            {
+                _showLoginModal = !_showLoginModal;
+            }
+
+            // Right: Currency Bar (Coins 125,750 +, Diamonds 2,560 +, Settings, Bell)
+            float curX = w - 420f;
+
+            // Coins Badge
+            GUI.DrawTexture(new Rect(curX, barY, 140, 36), _darkPanelTex);
+            GUIStyle curStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13, alignment = TextAnchor.MiddleLeft };
+            curStyle.normal.textColor = new Color(1.0f, 0.85f, 0.20f);
+            GUI.Label(new Rect(curX + 8, barY + 4, 100, 26), $"🪙 {_silverCoins:N0}", curStyle);
+            if (GUI.Button(new Rect(curX + 110, barY + 4, 24, 26), "+"))
+            {
+                _silverCoins += 5000;
+                if (_economyManager != null) _economyManager.AddCurrency(CurrencyType.SilverCoins, 5000, "Bonus");
+            }
+
+            // Diamonds Badge
+            curX += 148f;
+            GUI.DrawTexture(new Rect(curX, barY, 125, 36), _darkPanelTex);
+            curStyle.normal.textColor = new Color(0.35f, 0.75f, 1.0f);
+            GUI.Label(new Rect(curX + 8, barY + 4, 90, 26), $"💎 {_diamonds:N0}", curStyle);
+            if (GUI.Button(new Rect(curX + 96, barY + 4, 24, 26), "+"))
+            {
+                _diamonds += 250;
+            }
+
+            // Settings ⚙️
+            curX += 134f;
+            if (GUI.Button(new Rect(curX, barY, 38, 36), "⚙️"))
+            {
+                CurrentScreen = GameScreen.Settings;
+            }
+
+            // Notification Bell 🔔
+            curX += 44f;
+            if (GUI.Button(new Rect(curX, barY, 38, 36), "🔔"))
+            {
+                _authMessage = "Daily Bonus Ready! Claimed +500 Silver Coins.";
+                _silverCoins += 500;
+            }
+        }
+
+        private void DrawLeftMenu_Welcome(int w, int h)
+        {
+            float menuX = 20f;
+            float menuY = h * 0.32f;
+            float btnW = Mathf.Min(210f, w * 0.24f);
+            float btnH = 40f;
+            float gap = 8f;
+
+            // Big Yellow PLAY Button
+            GUI.backgroundColor = new Color(1.0f, 0.78f, 0.08f);
+            GUIStyle bigPlayStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 18 };
+            bigPlayStyle.normal.textColor = Color.black;
+            if (GUI.Button(new Rect(menuX, menuY, btnW, 48), "▶  PLAY", bigPlayStyle))
+            {
+                LaunchLoadingToRide();
+            }
+            GUI.backgroundColor = Color.white;
+            menuY += 56f;
+
+            // Nav buttons
+            DrawMenuNavButton(menuX, menuY, btnW, btnH, "🏠  GARAGE", () => CurrentScreen = GameScreen.Garage);
+            menuY += btnH + gap;
+            DrawMenuNavButton(menuX, menuY, btnW, btnH, "🛒  SHOWROOM", () => CurrentScreen = GameScreen.Garage);
+            menuY += btnH + gap;
+            DrawMenuNavButton(menuX, menuY, btnW, btnH, "📍  MAP", () => CurrentScreen = GameScreen.IndiaMap);
+            menuY += btnH + gap;
+            DrawMenuNavButton(menuX, menuY, btnW, btnH, "🏆  MISSIONS", () => CurrentScreen = GameScreen.Missions);
+            menuY += btnH + gap;
+            DrawMenuNavButton(menuX, menuY, btnW, btnH, "👥  MULTIPLAYER", () => CurrentScreen = GameScreen.Multiplayer);
+        }
+
+        private void DrawBottomNav_Welcome(int w, int h)
+        {
+            float navY = h - 52f;
+            float navX = 20f;
+            float btnW = 105f;
+            float btnH = 36f;
+            float gap = 10f;
+
+            DrawMenuNavButton(navX, navY, btnW, btnH, "👑 PROFILE", () => { CurrentScreen = GameScreen.Settings; _settingsTab = 4; });
+            navX += btnW + gap;
+            DrawMenuNavButton(navX, navY, btnW + 15, btnH, "⭐ AWARDS", () => CurrentScreen = GameScreen.RewardScreen);
+            navX += btnW + gap + 15;
+            DrawMenuNavButton(navX, navY, btnW, btnH, "🎁 REWARDS", () => { _silverCoins += 1000; _authMessage = "Claimed +1,000 Rewards!"; });
+            navX += btnW + gap;
+            DrawMenuNavButton(navX, navY, btnW, btnH, "👛 WALLET", () => { _showLoginModal = true; _loginTab = 0; });
+        }
+
+        private void DrawPromoCard_Welcome(int w, int h)
+        {
+            float cardW = 190f;
+            float cardH = 95f;
+            float cardX = w - cardW - 25f;
+            float cardY = 70f;
+
+            GUI.DrawTexture(new Rect(cardX, cardY, cardW, cardH), _darkPanelTex);
+            GUIStyle promoStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, fontSize = 12 };
+            promoStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(cardX, cardY + 8, cardW, 20), "NEW BIKE UNLOCKED!", promoStyle);
+
+            GUI.backgroundColor = new Color(0.85f, 0.15f, 0.15f);
+            if (GUI.Button(new Rect(cardX + 15, cardY + cardH - 36, cardW - 30, 26), "UNLOCK NOW >>"))
+            {
+                _selectedBikeIndex = 0; // Yamaha R15 V4
+                CurrentScreen = GameScreen.Garage;
+            }
+            GUI.backgroundColor = Color.white;
+        }
+
+        private void DrawStartRideButton_Welcome(int w, int h)
+        {
+            float btnW = Mathf.Min(260f, w * 0.32f);
+            float btnH = 58f;
+            float btnX = w - btnW - 25f;
+            float btnY = h - btnH - 22f;
+
+            GUI.backgroundColor = new Color(1.0f, 0.76f, 0.08f);
+            GUIStyle rideStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = Mathf.Max(20, h * 28 / 1000),
+                fontStyle = FontStyle.Bold
+            };
+            rideStyle.normal.textColor = Color.black;
+
+            if (GUI.Button(new Rect(btnX, btnY, btnW, btnH), "START RIDE >>", rideStyle))
+            {
+                LaunchLoadingToRide();
+            }
+            GUI.backgroundColor = Color.white;
+        }
+
+        private void DrawLoginAndSignupModal(int w, int h)
+        {
+            // Dim background overlay
             GUI.Box(new Rect(0, 0, w, h), "");
 
-            // Screen Tag
-            DrawScreenTag("1. Splash Screen");
+            float modalW = Mathf.Min(480f, w * 0.88f);
+            float modalH = Mathf.Min(390f, h * 0.85f);
+            float modalX = (w - modalW) * 0.5f;
+            float modalY = (h - modalH) * 0.5f;
 
-            // Big Speedometer Arc Title: "INDIAN BIKE LIFE"
-            GUIStyle logoStyle = new GUIStyle(GUI.skin.label)
+            // Modal Container
+            GUI.DrawTexture(new Rect(modalX, modalY, modalW, modalH), _darkPanelTex);
+
+            // Modal Header
+            GUI.DrawTexture(new Rect(modalX, modalY, modalW, 46), _blueHeaderTex);
+            GUIStyle headStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Max(38, h * 65 / 1000),
-                fontStyle = FontStyle.Bold
+                fontStyle = FontStyle.Bold,
+                fontSize = 15
             };
-            logoStyle.normal.textColor = new Color(1.0f, 0.55f, 0.05f); // Saffron Orange
-            GUI.Label(new Rect(0, h * 0.25f, w, 65), "INDIAN BIKE LIFE", logoStyle);
+            headStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(modalX, modalY + 10, modalW, 26), "🇮🇳 INDIAN BIKE LIFE — RIDER AUTHENTICATION", headStyle);
 
-            // Subtitle with Indian Tricolor Accent
-            GUIStyle subStyle = new GUIStyle(GUI.skin.label)
+            // Close button
+            if (GUI.Button(new Rect(modalX + modalW - 36, modalY + 8, 28, 28), "✖"))
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Max(16, h * 24 / 1000),
-                fontStyle = FontStyle.Bold
-            };
-            subStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(0, h * 0.25f + 65, w, 32), "🇮🇳  RIDE · EXPLORE · LIVE  🇮🇳", subStyle);
+                _showLoginModal = false;
+            }
 
-            // Bottom Progress Bar: "Loading... 85%"
-            float barW = Mathf.Min(560f, w * 0.72f);
-            float barH = 14f;
-            float barX = (w - barW) * 0.5f;
-            float barY = h * 0.82f;
+            // Tab bar: [SIGN IN] | [CREATE ACCOUNT] | [GUEST PLAY]
+            float tabY = modalY + 54f;
+            float tabW = (modalW - 40f) / 3f;
 
-            // Background Track
-            GUI.DrawTexture(new Rect(barX, barY, barW, barH), _darkPanelTex);
-
-            // Gold/Orange Progress Fill
-            int pct = Mathf.RoundToInt(_splashProgress * 100f);
-            GUI.DrawTexture(new Rect(barX, barY, barW * _splashProgress, barH), _goldBtnTex);
-
-            // Label above/under bar
-            GUIStyle pctStyle = new GUIStyle(GUI.skin.label)
+            for (int t = 0; t < 3; t++)
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Max(13, h * 18 / 1000),
-                fontStyle = FontStyle.Bold
-            };
-            pctStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(0, barY + 18, w, 26), $"Loading... {pct}%", pctStyle);
+                string tabTitle = t == 0 ? "🔑 SIGN IN" : (t == 1 ? "📝 SIGN UP" : "⚡ GUEST");
+                bool isSel = (_loginTab == t);
+                GUI.backgroundColor = isSel ? new Color(1.0f, 0.78f, 0.12f) : new Color(0.2f, 0.28f, 0.40f);
+                if (GUI.Button(new Rect(modalX + 20 + t * tabW, tabY, tabW - 4, 34), tabTitle))
+                {
+                    _loginTab = t;
+                }
+            }
+            GUI.backgroundColor = Color.white;
+
+            // Form Area
+            float formY = tabY + 48f;
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 12 };
+            labelStyle.normal.textColor = Color.white;
+
+            if (_loginTab == 0) // SIGN IN
+            {
+                GUI.Label(new Rect(modalX + 25, formY, 150, 20), "Email or Mobile Number:", labelStyle);
+                _inputEmail = GUI.TextField(new Rect(modalX + 25, formY + 22, modalW - 50, 32), _inputEmail);
+
+                formY += 62f;
+                GUI.Label(new Rect(modalX + 25, formY, 150, 20), "Password:", labelStyle);
+                _inputPassword = GUI.PasswordField(new Rect(modalX + 25, formY + 22, modalW - 50, 32), _inputPassword, '*');
+
+                formY += 62f;
+                _rememberMe = GUI.Toggle(new Rect(modalX + 25, formY, 180, 22), _rememberMe, " Remember Me");
+
+                formY += 30f;
+                GUI.backgroundColor = new Color(1.0f, 0.76f, 0.08f);
+                GUIStyle btnStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
+                btnStyle.normal.textColor = Color.black;
+                if (GUI.Button(new Rect(modalX + 25, formY, modalW - 50, 42), "SIGN IN ▶", btnStyle))
+                {
+                    _playerName = string.IsNullOrEmpty(_inputEmail) ? "Player_001" : _inputEmail.Split('@')[0];
+                    _isAuthenticated = true;
+                    PlayerPrefs.SetString("IBL_RiderName", _playerName);
+                    PlayerPrefs.Save();
+                    _showLoginModal = false;
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            else if (_loginTab == 1) // SIGN UP
+            {
+                GUI.Label(new Rect(modalX + 25, formY, 150, 20), "Rider Screen Name:", labelStyle);
+                _inputRiderName = GUI.TextField(new Rect(modalX + 25, formY + 22, modalW - 50, 30), _inputRiderName);
+
+                formY += 58f;
+                GUI.Label(new Rect(modalX + 25, formY, 150, 20), "Email or Mobile:", labelStyle);
+                _inputEmail = GUI.TextField(new Rect(modalX + 25, formY + 22, modalW - 50, 30), _inputEmail);
+
+                formY += 58f;
+                GUI.Label(new Rect(modalX + 25, formY, 150, 20), "Password:", labelStyle);
+                _inputPassword = GUI.PasswordField(new Rect(modalX + 25, formY + 22, modalW - 50, 30), _inputPassword, '*');
+
+                formY += 60f;
+                GUI.backgroundColor = new Color(0.12f, 0.75f, 0.35f);
+                GUIStyle signUpStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
+                if (GUI.Button(new Rect(modalX + 25, formY, modalW - 50, 42), "CREATE ACCOUNT ▶ (+2,500 COINS)", signUpStyle))
+                {
+                    _playerName = string.IsNullOrEmpty(_inputRiderName) ? "Rider_Pro" : _inputRiderName;
+                    _silverCoins += 2500;
+                    _isAuthenticated = true;
+                    PlayerPrefs.SetString("IBL_RiderName", _playerName);
+                    PlayerPrefs.Save();
+                    _showLoginModal = false;
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            else // GUEST PLAY
+            {
+                GUIStyle guestDesc = new GUIStyle(GUI.skin.label) { wordWrap = true, fontSize = 13 };
+                guestDesc.normal.textColor = new Color(0.9f, 0.9f, 0.95f);
+                GUI.Label(new Rect(modalX + 25, formY + 15, modalW - 50, 70),
+                    "Ride immediately across India without an account! Your high scores, tuned bikes and silver coins will be saved locally on this device.", guestDesc);
+
+                formY += 95f;
+                GUI.backgroundColor = new Color(1.0f, 0.78f, 0.08f);
+                GUIStyle guestBtn = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
+                guestBtn.normal.textColor = Color.black;
+                if (GUI.Button(new Rect(modalX + 25, formY, modalW - 50, 46), "CONTINUE AS GUEST ▶", guestBtn))
+                {
+                    _playerName = "Guest_Rider";
+                    _isAuthenticated = false;
+                    _showLoginModal = false;
+                }
+                GUI.backgroundColor = Color.white;
+            }
         }
 
         // =========================================================================
-        // SCREEN 2: MAIN MENU (Matches Reference 2. Main Menu)
+        // SCREEN 2: LOADING SCREEN (Matches Image 2)
         // =========================================================================
-        private void DrawScreen2_MainMenu(int w, int h)
+        private void DrawScreen2_Loading(int w, int h)
         {
-            DrawScreenTag("2. Main Menu");
+            // Draw Full Background Artwork (Image 2)
+            if (_loadingTex != null)
+            {
+                GUI.DrawTexture(new Rect(0, 0, w, h), _loadingTex, ScaleMode.ScaleAndCrop);
+            }
+            else
+            {
+                GUI.Box(new Rect(0, 0, w, h), "");
+            }
 
-            // Top-Left: Player Profile Badge
-            GUI.DrawTexture(new Rect(20, 15, 175, 52), _darkPanelTex);
-            GUIStyle nameStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 14 };
-            nameStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(32, 19, 150, 22), $"👤 {_playerName}", nameStyle);
+            DrawScreenTag("2. Loading Screen");
 
-            GUIStyle lvlStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, fontStyle = FontStyle.Bold };
-            lvlStyle.normal.textColor = new Color(1.0f, 0.80f, 0.20f);
-            GUI.Label(new Rect(32, 40, 150, 18), $"Lv. {_playerLevel}", lvlStyle);
+            // Dynamic Animated Loading Bar (Positioned exactly matching Image 2 at bottom center)
+            float barW = Mathf.Min(540f, w * 0.52f);
+            float barH = 20f;
+            float barX = (w - barW) * 0.5f;
+            float barY = h * 0.835f;
 
-            // Top-Right: Wallet (1250 Silver, 75 Gold, Settings gear)
-            DrawTopWallet(w);
+            // Background Track
+            GUI.DrawTexture(new Rect(barX - 2, barY - 2, barW + 4, barH + 4), _darkPanelTex);
 
-            // Right-Side Main Action Stack (Reference 2)
-            float rightStackW = Mathf.Min(220f, w * 0.26f);
-            float rightStackX = w - rightStackW - 25f;
-            float rightStackY = h * 0.22f;
+            // Glowing Golden-Orange Progress Fill
+            int pct = Mathf.Clamp(Mathf.RoundToInt(_loadingProgress * 100f), 0, 100);
+            GUI.DrawTexture(new Rect(barX, barY, barW * _loadingProgress, barH), _goldBtnTex);
 
-            // Big Indian Bike Life Logo on right
-            GUIStyle rightLogo = new GUIStyle(GUI.skin.label)
+            // Percentage Label: Loading... 75%
+            GUIStyle pctStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Max(22, h * 32 / 1000),
+                fontSize = Mathf.Max(14, h * 20 / 1000),
                 fontStyle = FontStyle.Bold
             };
-            rightLogo.normal.textColor = new Color(1.0f, 0.65f, 0.12f);
-            GUI.Label(new Rect(rightStackX - 20, rightStackY - 45, rightStackW + 40, 38), "INDIAN BIKE LIFE", rightLogo);
+            pctStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(barX, barY - 28, barW, 26), $"Loading... {pct}%", pctStyle);
 
-            // HUGE BRIGHT YELLOW CTA BUTTON: PLAY ▶
-            GUI.DrawTexture(new Rect(rightStackX, rightStackY, rightStackW, 58), _goldBtnTex);
+            // Cycling Tip under progress bar
+            GUIStyle tipStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = Mathf.Max(12, h * 16 / 1000),
+                fontStyle = FontStyle.Bold
+            };
+            tipStyle.normal.textColor = new Color(1.0f, 0.90f, 0.20f);
+            GUI.Label(new Rect(barX - 80, barY + barH + 6, barW + 160, 26), _loadingTips[_currentTipIndex], tipStyle);
+        }
+
+        // =========================================================================
+        // SCREEN 3: MAIN MENU / PLAY HUB (Matches Image 3)
+        // =========================================================================
+        private void DrawScreen3_MainMenu(int w, int h)
+        {
+            // Draw Full Background Artwork (Image 3)
+            if (_mainMenuTex != null)
+            {
+                GUI.DrawTexture(new Rect(0, 0, w, h), _mainMenuTex, ScaleMode.ScaleAndCrop);
+            }
+            else
+            {
+                GUI.Box(new Rect(0, 0, w, h), "");
+            }
+
+            DrawScreenTag("3. Main Play Hub");
+
+            // Top-Right Audio & Settings Quick Buttons (Sound, Music, Settings)
+            float trX = w - 145f;
+            float trY = 18f;
+
+            if (GUI.Button(new Rect(trX, trY, 36, 36), _soundEnabled ? "🔊" : "🔇"))
+            {
+                _soundEnabled = !_soundEnabled;
+            }
+            if (GUI.Button(new Rect(trX + 42, trY, 36, 36), _musicEnabled ? "🎵" : "🔈"))
+            {
+                _musicEnabled = !_musicEnabled;
+            }
+            if (GUI.Button(new Rect(trX + 84, trY, 36, 36), "⚙️"))
+            {
+                CurrentScreen = GameScreen.Settings;
+            }
+
+            // Bottom-Left Player Profile Card (Player_001, Lv. 1, 0/100 XP)
+            float profX = 25f;
+            float profY = h - 75f;
+            GUI.DrawTexture(new Rect(profX, profY, 210, 56), _darkPanelTex);
+
+            GUIStyle nameStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 14 };
+            nameStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(profX + 12, profY + 6, 180, 20), $"👤 {_playerName}", nameStyle);
+
+            GUIStyle lvStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, fontStyle = FontStyle.Bold };
+            lvStyle.normal.textColor = new Color(1.0f, 0.80f, 0.20f);
+            GUI.Label(new Rect(profX + 12, profY + 28, 180, 18), $"Lv. {_playerLevel}   XP: {_playerXP} / 100", lvStyle);
+
+            // Right-Side Main Action Stack (PLAY, GARAGE, MAP, MISSIONS, MULTIPLAYER, SETTINGS)
+            float rightStackW = Mathf.Min(220f, w * 0.26f);
+            float rightStackX = w - rightStackW - 25f;
+            float rightStackY = h * 0.38f;
+            float btnH = 42f;
+            float gap = 7f;
+
+            // Big Yellow PLAY Button
+            GUI.backgroundColor = new Color(1.0f, 0.78f, 0.08f);
             GUIStyle playBtnStyle = new GUIStyle(GUI.skin.button)
             {
-                fontSize = Mathf.Max(22, h * 32 / 1000),
+                fontSize = Mathf.Max(20, h * 28 / 1000),
                 fontStyle = FontStyle.Bold
             };
             playBtnStyle.normal.textColor = Color.black;
-            if (GUI.Button(new Rect(rightStackX, rightStackY, rightStackW, 58), "PLAY ▶", playBtnStyle))
+            if (GUI.Button(new Rect(rightStackX, rightStackY, rightStackW, 52), "▶  PLAY", playBtnStyle))
             {
                 ApplyCustomizationsToBike();
                 CurrentScreen = GameScreen.RidingHUD;
             }
+            GUI.backgroundColor = Color.white;
+            rightStackY += 58f;
 
-            // Vertical Menu Navigation Stack
-            float navY = rightStackY + 70f;
-            float navBtnH = 40f;
-
-            DrawMenuNavButton(rightStackX, navY, rightStackW, navBtnH, "🏍️ GARAGE", () => CurrentScreen = GameScreen.Garage);
-            navY += navBtnH + 8;
-            DrawMenuNavButton(rightStackX, navY, rightStackW, navBtnH, "🗺️ MAP", () => CurrentScreen = GameScreen.IndiaMap);
-            navY += navBtnH + 8;
-            DrawMenuNavButton(rightStackX, navY, rightStackW, navBtnH, "🎯 MISSIONS", () => CurrentScreen = GameScreen.Missions);
-            navY += navBtnH + 8;
-            DrawMenuNavButton(rightStackX, navY, rightStackW, navBtnH, "👥 MULTIPLAYER", () => CurrentScreen = GameScreen.Multiplayer);
-
-            // Bottom-Left Buttons: PROFILE & ACHIEVEMENTS (Reference 2)
-            float bottomY = h - 55f;
-            GUI.DrawTexture(new Rect(20, bottomY, 120, 38), _darkPanelTex);
-            if (GUI.Button(new Rect(20, bottomY, 120, 38), "👤 PROFILE"))
-            {
-                CurrentScreen = GameScreen.Settings;
-                _settingsTab = 4; // Account/Profile
-            }
-
-            GUI.DrawTexture(new Rect(148, bottomY, 140, 38), _darkPanelTex);
-            if (GUI.Button(new Rect(148, bottomY, 140, 38), "🎨 AVATAR"))
-            {
-                CurrentScreen = GameScreen.AvatarStudio;
-            }
-
-            GUI.DrawTexture(new Rect(296, bottomY, 150, 38), _darkPanelTex);
-            if (GUI.Button(new Rect(296, bottomY, 150, 38), "⭐ ACHIEVEMENTS"))
-            {
-                CurrentScreen = GameScreen.RewardScreen;
-            }
+            DrawMenuNavButton(rightStackX, rightStackY, rightStackW, btnH, "🏠  GARAGE", () => CurrentScreen = GameScreen.Garage);
+            rightStackY += btnH + gap;
+            DrawMenuNavButton(rightStackX, rightStackY, rightStackW, btnH, "📍  MAP", () => CurrentScreen = GameScreen.IndiaMap);
+            rightStackY += btnH + gap;
+            DrawMenuNavButton(rightStackX, rightStackY, rightStackW, btnH, "🏆  MISSIONS", () => CurrentScreen = GameScreen.Missions);
+            rightStackY += btnH + gap;
+            DrawMenuNavButton(rightStackX, rightStackY, rightStackW, btnH, "👥  MULTIPLAYER", () => CurrentScreen = GameScreen.Multiplayer);
+            rightStackY += btnH + gap;
+            DrawMenuNavButton(rightStackX, rightStackY, rightStackW, btnH, "⚙️  SETTINGS", () => CurrentScreen = GameScreen.Settings);
         }
 
         // =========================================================================
-        // SCREEN 3: GARAGE (Matches Reference 3. Garage)
+        // SCREEN 4: GARAGE (Matches Reference 3)
         // =========================================================================
-        private void DrawScreen3_Garage(int w, int h)
+        private void DrawScreen4_Garage(int w, int h)
         {
-            DrawScreenTag("3. Garage");
+            DrawScreenTag("4. Garage");
 
-            // Top Bar: [⬅] GARAGE + Wallet
-            DrawHeaderBar(w, "GARAGE", () => CurrentScreen = GameScreen.MainMenu);
+            // Header Back Button & Title
+            DrawHeaderWithBack(w, "GARAGE & SHOWROOM", () => CurrentScreen = GameScreen.MainMenu);
             DrawTopWallet(w);
 
-            // Right Side Spec Panel: Bike Name, Speed, Handling, Braking, Fuel, UPGRADE, CUSTOMIZE
-            float panelW = Mathf.Min(280f, w * 0.30f);
+            // Right Motorcycle Spec & Action Card (Reference 3)
+            float panelW = Mathf.Min(320f, w * 0.32f);
             float panelX = w - panelW - 25f;
             float panelY = 70f;
 
             GUI.DrawTexture(new Rect(panelX, panelY, panelW, h - panelY - 95), _darkPanelTex);
             GUILayout.BeginArea(new Rect(panelX + 16, panelY + 16, panelW - 32, h - panelY - 120));
 
-            // Motorcycle Name
-            GUIStyle bikeTitleStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 17,
-                fontStyle = FontStyle.Bold
-            };
+            GUIStyle bikeTitleStyle = new GUIStyle(GUI.skin.label) { fontSize = 17, fontStyle = FontStyle.Bold };
             bikeTitleStyle.normal.textColor = Color.white;
             GUILayout.Label(_bikeModelNames[_selectedBikeIndex], bikeTitleStyle);
-            GUILayout.Space(12);
+            GUILayout.Space(10);
 
-            // Stat Bars with filled blue indicators
+            // Specs
             DrawSpecBar("Speed", _bikeSpeeds[_selectedBikeIndex]);
             DrawSpecBar("Handling", _bikeHandlings[_selectedBikeIndex]);
             DrawSpecBar("Braking", _bikeBrakings[_selectedBikeIndex]);
             DrawSpecBar("Fuel", _bikeFuels[_selectedBikeIndex]);
 
-            GUILayout.Space(16);
+            GUILayout.Space(14);
 
-            // Big Yellow UPGRADE Button
+            // UPGRADE Button
             GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
-            GUIStyle upStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
+            GUIStyle upStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
             upStyle.normal.textColor = Color.black;
-            if (GUILayout.Button("UPGRADE (₹500)", upStyle, GUILayout.Height(44)))
+            if (GUILayout.Button("UPGRADE (₹500)", upStyle, GUILayout.Height(38)))
             {
-                if (_economyManager != null && _economyManager.SpendCurrency(CurrencyType.SilverCoins, 500, "Bike Upgrade"))
+                if (_silverCoins >= 500)
                 {
-                    _bikeSpeeds[_selectedBikeIndex] = Mathf.Min(1.0f, _bikeSpeeds[_selectedBikeIndex] + 0.05f);
+                    _silverCoins -= 500;
+                    _bikeSpeeds[_selectedBikeIndex] = Mathf.Min(1.0f, _bikeSpeeds[_selectedBikeIndex] + 0.04f);
                     ApplyCustomizationsToBike();
                 }
             }
 
-            GUILayout.Space(6);
-            // Blue CUSTOMIZE COLOR Button
+            GUILayout.Space(5);
+            // BIKE COLOR Button
             GUI.backgroundColor = new Color(0.12f, 0.50f, 0.98f);
-            GUIStyle custStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 13 };
-            if (GUILayout.Button("🎨 BIKE COLOR", custStyle, GUILayout.Height(32)))
+            if (GUILayout.Button("🎨 BIKE COLOR", GUILayout.Height(30)))
             {
                 _selectedColorIndex = (_selectedColorIndex + 1) % _bikeColors.Length;
                 ApplyCustomizationsToBike();
             }
 
-            GUILayout.Space(4);
-            // Orange AVATAR STUDIO Button
+            GUILayout.Space(5);
+            // AVATAR Button
             GUI.backgroundColor = new Color(1.0f, 0.55f, 0.12f);
-            if (GUILayout.Button("👤 RIDER AVATAR", custStyle, GUILayout.Height(32)))
+            if (GUILayout.Button("👤 RIDER AVATAR", GUILayout.Height(30)))
             {
                 CurrentScreen = GameScreen.AvatarStudio;
             }
 
-            GUILayout.Space(4);
-            // Passenger Toggle (Couple Riding)
+            GUILayout.Space(5);
+            // Couple Riding Toggle
             GUI.backgroundColor = _isCoupleRiding ? new Color(0.85f, 0.35f, 0.65f) : new Color(0.35f, 0.45f, 0.60f);
             if (GUILayout.Button(_isCoupleRiding ? "👥 COUPLE: ON" : "👤 SOLO RIDER", GUILayout.Height(30)))
             {
@@ -561,7 +967,7 @@ namespace IndianBikeLife.Core.UI
 
             GUILayout.EndArea();
 
-            // Bottom Bike Carousel Selector with < and > arrows (Reference 3)
+            // Bottom Carousel
             float carouselH = 75f;
             float carouselY = h - carouselH - 10f;
             float carouselW = w - 50f;
@@ -569,28 +975,18 @@ namespace IndianBikeLife.Core.UI
 
             GUI.DrawTexture(new Rect(carouselX, carouselY, carouselW, carouselH), _darkPanelTex);
 
-            // Left Arrow <
             if (GUI.Button(new Rect(carouselX + 8, carouselY + 12, 45, carouselH - 24), "◀"))
             {
                 _selectedBikeIndex = (_selectedBikeIndex - 1 + _bikeModelNames.Length) % _bikeModelNames.Length;
                 ApplyCustomizationsToBike();
             }
 
-            // Bike Thumbnails in Center
             float slotW = (carouselW - 130f) / _bikeModelNames.Length;
             for (int b = 0; b < _bikeModelNames.Length; b++)
             {
                 float slotX = carouselX + 60f + b * slotW;
                 bool isCur = (_selectedBikeIndex == b);
-
-                if (isCur)
-                {
-                    GUI.DrawTexture(new Rect(slotX, carouselY + 8, slotW - 6, carouselH - 16), _goldBtnTex);
-                }
-                else
-                {
-                    GUI.DrawTexture(new Rect(slotX, carouselY + 8, slotW - 6, carouselH - 16), _lightPanelTex);
-                }
+                GUI.DrawTexture(new Rect(slotX, carouselY + 8, slotW - 6, carouselH - 16), isCur ? _goldBtnTex : _lightPanelTex);
 
                 GUIStyle slotStyle = new GUIStyle(GUI.skin.button)
                 {
@@ -598,15 +994,13 @@ namespace IndianBikeLife.Core.UI
                     fontStyle = FontStyle.Bold
                 };
                 slotStyle.normal.textColor = isCur ? Color.black : Color.white;
-
-                if (GUI.Button(new Rect(slotX, carouselY + 8, slotW - 6, carouselH - 16), $"🏍️\n{_bikeModelNames[b]}", slotStyle))
+                if (GUI.Button(new Rect(slotX, carouselY + 8, slotW - 6, carouselH - 16), _bikeModelNames[b], slotStyle))
                 {
                     _selectedBikeIndex = b;
                     ApplyCustomizationsToBike();
                 }
             }
 
-            // Right Arrow >
             if (GUI.Button(new Rect(carouselX + carouselW - 53, carouselY + 12, 45, carouselH - 24), "▶"))
             {
                 _selectedBikeIndex = (_selectedBikeIndex + 1) % _bikeModelNames.Length;
@@ -614,157 +1008,95 @@ namespace IndianBikeLife.Core.UI
             }
         }
 
-        private void DrawSpecBar(string label, float fraction)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.Width(75));
-
-            Rect r = GUILayoutUtility.GetRect(130, 14);
-            GUI.DrawTexture(r, _lightPanelTex);
-            GUI.DrawTexture(new Rect(r.x, r.y, r.width * Mathf.Clamp01(fraction), r.height), _barFillTex);
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(4);
-        }
-
         // =========================================================================
-        // SCREEN 4: INDIA MAP (Matches Reference 4. India Map)
+        // SCREEN 5: INDIA MAP (Matches Reference 4)
         // =========================================================================
-        private void DrawScreen4_IndiaMap(int w, int h)
+        private void DrawScreen5_IndiaMap(int w, int h)
         {
-            DrawScreenTag("4. India Map");
+            DrawScreenTag("5. India Map");
+            DrawHeaderWithBack(w, "INDIA HIGHWAY MAP", () => CurrentScreen = GameScreen.MainMenu);
 
-            // Top Bar: [⬅] INDIA MAP
-            DrawHeaderBar(w, "INDIA MAP", () => CurrentScreen = GameScreen.MainMenu);
+            // Left States Grid
+            float gridW = Mathf.Min(400f, w * 0.44f);
+            float startY = 70f;
+            GUI.DrawTexture(new Rect(25, startY, gridW, h - startY - 20), _darkPanelTex);
 
-            // Left Side: 3D Geographical Map Card with Pinned States
-            float mapW = Mathf.Min(560f, w * 0.58f);
-            float mapY = 70f;
-            float mapH = h - mapY - 25f;
+            GUILayout.BeginArea(new Rect(35, startY + 12, gridW - 20, h - startY - 35));
+            GUILayout.Label("<b>SELECT HIGHWAY CORRIDOR</b>", new GUIStyle(GUI.skin.label) { fontSize = 14 });
+            GUILayout.Space(8);
 
-            GUI.DrawTexture(new Rect(25, mapY, mapW, mapH), _darkPanelTex);
-
-            GUIStyle mapHeader = new GUIStyle(GUI.skin.label)
+            for (int i = 0; i < _stateNames.Length; i++)
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 18,
-                fontStyle = FontStyle.Bold
-            };
-            mapHeader.normal.textColor = new Color(1f, 0.75f, 0.15f);
-            GUI.Label(new Rect(25, mapY + 12, mapW, 28), "🗺️ 28 STATES & 8 UNION TERRITORIES OF INDIA", mapHeader);
-
-            // State Selection Grid inside Map
-            float gridY = mapY + 48f;
-            float colW = (mapW - 35) / 2f;
-            for (int s = 0; s < _stateNames.Length; s++)
-            {
-                int col = s % 2;
-                int row = s / 2;
-                float sx = 35 + col * (colW + 10);
-                float sy = gridY + row * 44;
-
-                bool isSel = (_selectedStateIndex == s);
-                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : new Color(0.12f, 0.28f, 0.55f);
-                GUIStyle sBtn = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 13 };
-                sBtn.normal.textColor = isSel ? Color.black : Color.white;
-
-                if (GUI.Button(new Rect(sx, sy, colW, 38), $"📍 {_stateNames[s]}", sBtn))
+                bool isSel = (_selectedStateIndex == i);
+                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : new Color(0.15f, 0.28f, 0.48f);
+                if (GUILayout.Button(_stateNames[i], GUILayout.Height(36)))
                 {
-                    _selectedStateIndex = s;
-                    var roadGen = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
-                    roadGen?.LoadStateEnvironment(_selectedStateIndex);
+                    _selectedStateIndex = i;
+                    var env = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
+                    if (env != null) env.LoadStateEnvironment(_selectedStateIndex);
                 }
             }
             GUI.backgroundColor = Color.white;
+            GUILayout.EndArea();
 
-            // Right Side Card: "Tamil Nadu", Districts: 38, Locations: 250+, SELECT STATE ▶ (Reference 4)
-            float cardW = w - mapW - 65f;
-            float cardX = 35 + mapW + 10f;
-            float cardH = mapH;
+            // Right State Details Card
+            float cardX = 25 + gridW + 20f;
+            float cardW = w - cardX - 25f;
+            GUI.DrawTexture(new Rect(cardX, startY, cardW, h - startY - 20), _darkPanelTex);
 
-            GUI.DrawTexture(new Rect(cardX, mapY, cardW, cardH), _darkPanelTex);
-
-            GUILayout.BeginArea(new Rect(cardX + 16, mapY + 18, cardW - 32, cardH - 36));
-
-            // State Name Title (Reference 4: Tamil Nadu)
-            GUIStyle stateTitle = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
-            stateTitle.normal.textColor = new Color(1.0f, 0.82f, 0.20f);
-            GUILayout.Label(_stateNames[_selectedStateIndex], stateTitle);
-
+            GUILayout.BeginArea(new Rect(cardX + 20, startY + 20, cardW - 40, h - startY - 45));
+            GUIStyle stHead = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
+            stHead.normal.textColor = new Color(1f, 0.80f, 0.20f);
+            GUILayout.Label(_stateNames[_selectedStateIndex], stHead);
             GUILayout.Space(12);
-            // Temple Thumbnail Banner Box (Reference 4)
-            Rect thumbRect = GUILayoutUtility.GetRect(cardW - 32, 130);
-            GUI.DrawTexture(thumbRect, _lightPanelTex);
-            GUIStyle thumbStyle = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 14,
-                fontStyle = FontStyle.Bold
-            };
-            thumbStyle.normal.textColor = Color.white;
-            GUI.Label(thumbRect, $"🏛️ HISTORIC CORRIDOR\n{_stateNames[_selectedStateIndex]}", thumbStyle);
 
-            GUILayout.Space(14);
-            // Districts & Locations
-            GUIStyle descStyle = new GUIStyle(GUI.skin.label) { fontSize = 13 };
+            GUIStyle descStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, wordWrap = true };
             descStyle.normal.textColor = Color.white;
             GUILayout.Label(_stateDescriptions[_selectedStateIndex], descStyle);
 
             GUILayout.FlexibleSpace();
 
-            // Big Yellow CTA Button: SELECT STATE ▶ (Reference 4)
             GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
-            GUIStyle selStyle = new GUIStyle(GUI.skin.button)
+            GUIStyle selBtn = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 18 };
+            selBtn.normal.textColor = Color.black;
+            if (GUILayout.Button("SELECT STATE ▶", selBtn, GUILayout.Height(52)))
             {
-                fontSize = 17,
-                fontStyle = FontStyle.Bold
-            };
-            selStyle.normal.textColor = Color.black;
-
-            if (GUILayout.Button("SELECT STATE ▶", selStyle, GUILayout.Height(50)))
-            {
-                var roadGen = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
-                roadGen?.LoadStateEnvironment(_selectedStateIndex);
-                if (_motorcycle != null)
-                {
-                    _motorcycle.RespawnOnRoad();
-                }
+                var env = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
+                if (env != null) env.LoadStateEnvironment(_selectedStateIndex);
                 ApplyCustomizationsToBike();
                 CurrentScreen = GameScreen.RidingHUD;
             }
             GUI.backgroundColor = Color.white;
-
             GUILayout.EndArea();
         }
 
         // =========================================================================
-        // SCREEN 5: RIDING HUD (Matches Reference 5. Riding HUD)
+        // SCREEN 6: RIDING HUD (Matches Reference 5)
         // =========================================================================
-        private void DrawScreen5_RidingHUD(int w, int h)
+        private void DrawScreen6_RidingHUD(int w, int h)
         {
-            DrawScreenTag("5. Riding HUD");
-
-            // Top-Left: Circular GPS Mini-Map (Reference 5)
-            float mapSize = Mathf.Min(110f, h * 0.24f);
+            // Top-Left GPS Radar
+            float mapSize = 85f;
             GUI.DrawTexture(new Rect(20, 20, mapSize, mapSize), _darkPanelTex);
             GUIStyle gpsStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 12,
+                fontSize = 11,
                 fontStyle = FontStyle.Bold
             };
-            gpsStyle.normal.textColor = new Color(0.2f, 0.9f, 0.4f);
-            GUI.Label(new Rect(20, 20, mapSize, mapSize), "🧭 GPS\nNH-44", gpsStyle);
+            gpsStyle.normal.textColor = new Color(0.2f, 0.95f, 0.45f);
+            GUI.Label(new Rect(20, 20, mapSize, mapSize), $"🧭 GPS
+{_stateNames[_selectedStateIndex]}", gpsStyle);
 
-            // Top-Center: Fuel Bar (Reference 5)
+            // Top-Center: Fuel Bar
             float fuelW = 180f;
             float fuelH = 16f;
             float fuelX = (w - fuelW) * 0.5f;
             GUI.DrawTexture(new Rect(fuelX, 15, fuelW, fuelH), _darkPanelTex);
-            GUI.DrawTexture(new Rect(fuelX, 15, fuelW * 0.88f, fuelH), _greenBtnTex);
+            GUI.DrawTexture(new Rect(fuelX, 15, fuelW * 0.90f, fuelH), _greenBtnTex);
             GUI.Label(new Rect(fuelX - 25, 12, 22, 20), "⛽");
 
-            // Top-Right: Digital Speedometer "120 km/h" with Red Gear Badge "5" (Reference 5)
+            // Top-Right: Speedometer & Gear
             float curSpeed = _motorcycle != null ? _motorcycle.CurrentSpeedKmh : 120f;
             int curGear = _motorcycle != null ? _motorcycle.CurrentGear : 5;
 
@@ -785,12 +1117,12 @@ namespace IndianBikeLife.Core.UI
             kmhStyle.normal.textColor = Color.gray;
             GUI.Label(new Rect(speedBoxX + 104, 26, 45, 18), "km/h", kmhStyle);
 
-            // Red Gear Badge: 5
+            // Red Gear Badge
             GUI.backgroundColor = new Color(0.85f, 0.15f, 0.15f);
             GUI.Box(new Rect(speedBoxX + speedBoxW - 24, 18, 20, 22), $"{curGear}");
             GUI.backgroundColor = Color.white;
 
-            // Right Vertical Control Icons: Camera View 📷, Horn 📢, Settings/Menu ⚙️ (Reference 5)
+            // Right Vertical Control Icons: Camera 📷, Horn 📢, Couple 👥, Menu ⚙️
             float iconX = w - 55f;
             float iconY = 85f;
             if (GUI.Button(new Rect(iconX, iconY, 40, 40), "📷"))
@@ -812,7 +1144,7 @@ namespace IndianBikeLife.Core.UI
                 CurrentScreen = GameScreen.MainMenu;
             }
 
-            // Bottom-Left: Steering Touch Arrows ◀ ▶ (Reference 5)
+            // Bottom-Left: Steering Touch Arrows ◀ ▶
             float steerY = h - 90f;
             if (GUI.RepeatButton(new Rect(30, steerY, 70, 70), "◀"))
             {
@@ -823,8 +1155,8 @@ namespace IndianBikeLife.Core.UI
                 _motorcycle?.SetSteerInput(0.85f);
             }
 
-            // Center Upright Re-center Button & 360-degree look hint
-            if (GUI.Button(new Rect(w * 0.5f - 60f, h - 45f, 120f, 32f), "🔄 RE-CENTER"))
+            // Center Upright Re-center Button & 360 Hint
+            if (GUI.Button(new Rect(w * 0.5f - 65f, h - 45f, 130f, 32f), "🔄 RE-CENTER"))
             {
                 _motorcycle?.RespawnOnRoad();
             }
@@ -835,571 +1167,355 @@ namespace IndianBikeLife.Core.UI
                 fontSize = 11,
                 fontStyle = FontStyle.Bold
             };
-            hintStyle.normal.textColor = new Color(1f, 1f, 1f, 0.70f);
-            GUI.Label(new Rect(w * 0.5f - 150f, h - 72f, 300f, 22f), "👆 Swipe / Drag Screen for 360° View", hintStyle);
+            hintStyle.normal.textColor = new Color(1f, 1f, 1f, 0.75f);
+            GUI.Label(new Rect(w * 0.5f - 160f, h - 72f, 320f, 22f), "👆 Swipe / Drag Screen for 360° View", hintStyle);
 
-            // Bottom-Right: Brake Pedal & Gas Throttle Pedal (Reference 5)
+            // Bottom-Right: Brake & Gas Pedals
             float pedalY = h - 100f;
             float brakeX = w - 180f;
             float gasX = w - 95f;
 
-            // Brake Pedal
             GUI.backgroundColor = new Color(0.7f, 0.2f, 0.2f);
-            if (GUI.RepeatButton(new Rect(brakeX, pedalY + 15, 65, 75), "BRAKE\n🛑"))
+            if (GUI.RepeatButton(new Rect(brakeX, pedalY + 15, 65, 75), "BRAKE
+🛑"))
             {
                 _motorcycle?.SetBrakeInput(1f);
             }
 
-            // Gas Throttle Pedal (Tread Pattern)
             GUI.backgroundColor = new Color(0.2f, 0.75f, 0.3f);
-            if (GUI.RepeatButton(new Rect(gasX, pedalY, 70, 90), "GAS\n⚡"))
+            if (GUI.RepeatButton(new Rect(gasX, pedalY, 70, 90), "GAS
+⚡"))
             {
                 _motorcycle?.SetThrottleInput(1f);
             }
             GUI.backgroundColor = Color.white;
+        }
 
-            // Top-Left In-Game Garage / Menu Shortcut Button
-            if (GUI.Button(new Rect(145, 20, 110, 32), "🏍️ GARAGE"))
+        // =========================================================================
+        // SCREEN 7: MISSIONS (Matches Reference 6)
+        // =========================================================================
+        private void DrawScreen7_Missions(int w, int h)
+        {
+            DrawScreenTag("7. Missions");
+            DrawHeaderWithBack(w, "MISSIONS & CHALLENGES", () => CurrentScreen = GameScreen.MainMenu);
+
+            float cardW = Mathf.Min(680f, w * 0.75f);
+            float cardX = (w - cardW) * 0.5f;
+            float startY = 70f;
+
+            GUI.DrawTexture(new Rect(cardX, startY, cardW, h - startY - 20), _darkPanelTex);
+
+            GUILayout.BeginArea(new Rect(cardX + 20, startY + 15, cardW - 40, h - startY - 35));
+
+            // Tabs: Story, Daily, Weekly
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Story Missions", GUILayout.Height(34))) _missionTab = 0;
+            if (GUILayout.Button("Daily Tasks", GUILayout.Height(34))) _missionTab = 1;
+            if (GUILayout.Button("Weekly Challenges", GUILayout.Height(34))) _missionTab = 2;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(16);
+
+            // Mission List
+            DrawMissionRow("Reach Chennai Express Toll", "Story", "0 / 1", 500, ref _mission1Claimed);
+            GUILayout.Space(10);
+            DrawMissionRow("Complete 5 Highway Rides", "Daily", "0 / 5", 300, ref _mission2Claimed);
+            GUILayout.Space(10);
+            DrawMissionRow("Travel 100 KM on NH-44", "Weekly", "0 / 100 km", 1000, ref _mission3Claimed);
+
+            GUILayout.EndArea();
+        }
+
+        private void DrawMissionRow(string title, string tag, string progress, int coins, ref bool claimed)
+        {
+            GUILayout.BeginHorizontal("box");
+            GUILayout.BeginVertical();
+            GUILayout.Label($"<b>{title}</b> ({tag})");
+            GUILayout.Label($"Progress: {progress}    Reward: 🪙 {coins}");
+            GUILayout.EndVertical();
+
+            if (claimed)
+            {
+                GUI.enabled = false;
+                GUILayout.Button("CLAIMED", GUILayout.Width(90), GUILayout.Height(36));
+                GUI.enabled = true;
+            }
+            else
+            {
+                GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
+                if (GUILayout.Button("GO ▶", GUILayout.Width(90), GUILayout.Height(36)))
+                {
+                    claimed = true;
+                    _silverCoins += coins;
+                    CurrentScreen = GameScreen.RidingHUD;
+                }
+                GUI.backgroundColor = Color.white;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        // =========================================================================
+        // SCREEN 8: MULTIPLAYER (Matches Reference 7)
+        // =========================================================================
+        private void DrawScreen8_Multiplayer(int w, int h)
+        {
+            DrawScreenTag("8. Multiplayer");
+            DrawHeaderWithBack(w, "MULTIPLAYER HIGHWAY CONVOY", () => CurrentScreen = GameScreen.MainMenu);
+
+            float cardW = Mathf.Min(700f, w * 0.80f);
+            float cardX = (w - cardW) * 0.5f;
+            float startY = 70f;
+
+            GUI.DrawTexture(new Rect(cardX, startY, cardW, h - startY - 20), _darkPanelTex);
+
+            GUILayout.BeginArea(new Rect(cardX + 25, startY + 20, cardW - 50, h - startY - 45));
+
+            GUILayout.Label("<b>Online Riders: 2,456</b>  |  Convoy Ping: 24 ms", new GUIStyle(GUI.skin.label) { fontSize = 14 });
+            GUILayout.Space(12);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Convoy Room Code:", GUILayout.Width(140));
+            _roomCodeInput = GUILayout.TextField(_roomCodeInput, GUILayout.Width(160));
+
+            GUI.backgroundColor = new Color(0.12f, 0.72f, 0.28f);
+            if (GUILayout.Button("JOIN ROOM ▶", GUILayout.Height(28)))
+            {
+                _multiplayerStatus = $"Joined Convoy {_roomCodeInput}! 4 Riders Ready.";
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(15);
+            GUILayout.Label($"<b>Status:</b> {_multiplayerStatus}");
+            GUILayout.Space(15);
+
+            GUILayout.Label("<b>Online Friends Ready to Ride:</b>");
+            for (int f = 0; f < _convoyFriends.Length; f++)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(_convoyFriends[f], GUILayout.Width(220));
+                if (GUILayout.Button("INVITE", GUILayout.Width(80)))
+                {
+                    _multiplayerStatus = $"Invited {_convoyFriends[f]} to your convoy!";
+                }
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = new Color(1.0f, 0.76f, 0.08f);
+            GUIStyle goBtn = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 17 };
+            goBtn.normal.textColor = Color.black;
+            if (GUILayout.Button("START CONVOY RIDE ▶", goBtn, GUILayout.Height(46)))
+            {
+                CurrentScreen = GameScreen.RidingHUD;
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.EndArea();
+        }
+
+        // =========================================================================
+        // SCREEN 9: SETTINGS (Matches Reference 8)
+        // =========================================================================
+        private void DrawScreen9_Settings(int w, int h)
+        {
+            DrawScreenTag("9. Settings");
+            DrawHeaderWithBack(w, "GAME SETTINGS", () => CurrentScreen = GameScreen.MainMenu);
+
+            float cardW = Mathf.Min(650f, w * 0.78f);
+            float cardX = (w - cardW) * 0.5f;
+            float startY = 70f;
+
+            GUI.DrawTexture(new Rect(cardX, startY, cardW, h - startY - 20), _darkPanelTex);
+
+            GUILayout.BeginArea(new Rect(cardX + 25, startY + 20, cardW - 50, h - startY - 45));
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Graphics", GUILayout.Height(32))) _settingsTab = 0;
+            if (GUILayout.Button("Audio", GUILayout.Height(32))) _settingsTab = 1;
+            if (GUILayout.Button("Controls", GUILayout.Height(32))) _settingsTab = 2;
+            if (GUILayout.Button("Account", GUILayout.Height(32))) _settingsTab = 4;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(20);
+
+            if (_settingsTab == 0) // Graphics
+            {
+                GUILayout.Label("Graphics Quality:");
+                GUILayout.BeginHorizontal();
+                string[] q = new[] { "Low", "Medium", "High", "Ultra" };
+                for (int i = 0; i < q.Length; i++)
+                {
+                    if (GUILayout.Toggle(_graphicsQualityIndex == i, q[i], "Button")) _graphicsQualityIndex = i;
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(14);
+                GUILayout.Label("Frame Rate:");
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Toggle(_frameRateIndex == 0, "30 FPS", "Button")) _frameRateIndex = 0;
+                if (GUILayout.Toggle(_frameRateIndex == 1, "60 FPS", "Button")) _frameRateIndex = 1;
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(14);
+                _bloomEnabled = GUILayout.Toggle(_bloomEnabled, " Bloom & Sun Shafts");
+                _shadowsEnabled = GUILayout.Toggle(_shadowsEnabled, " Realtime Shadows");
+            }
+            else if (_settingsTab == 1) // Audio
+            {
+                GUILayout.Label($"Master Volume: {Mathf.RoundToInt(_masterVolume * 100)}%");
+                _masterVolume = GUILayout.HorizontalSlider(_masterVolume, 0f, 1f);
+
+                GUILayout.Space(12);
+                GUILayout.Label($"Motorcycle Engine: {Mathf.RoundToInt(_engineVolume * 100)}%");
+                _engineVolume = GUILayout.HorizontalSlider(_engineVolume, 0f, 1f);
+
+                GUILayout.Space(12);
+                GUILayout.Label($"Highway Horn: {Mathf.RoundToInt(_hornVolume * 100)}%");
+                _hornVolume = GUILayout.HorizontalSlider(_hornVolume, 0f, 1f);
+            }
+            else if (_settingsTab == 2) // Controls
+            {
+                GUILayout.Label("Steering Mode: Touch Buttons (◀ ▶) + Tilt Gyro + Keyboard WASD");
+                GUILayout.Label("Sensitivity: Adaptive high-speed damping enabled");
+                GUILayout.Label("Camera: 360° Touch Orbit + Auto-recenter enabled");
+            }
+            else // Account
+            {
+                GUILayout.Label($"<b>Rider Profile:</b> {_playerName}");
+                GUILayout.Label($"<b>Wallet:</b> 🪙 {_silverCoins:N0} Silver  |  💎 {_diamonds:N0} Diamonds");
+                GUILayout.Space(12);
+                if (GUILayout.Button("SWITCH ACCOUNT / RE-LOGIN", GUILayout.Height(36)))
+                {
+                    _showLoginModal = true;
+                    CurrentScreen = GameScreen.WelcomeAndLogin;
+                }
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
+            if (GUILayout.Button("APPLY SETTINGS ▶", GUILayout.Height(40)))
+            {
+                QualitySettings.SetQualityLevel(_graphicsQualityIndex, true);
+                Application.targetFrameRate = _frameRateIndex == 1 ? 60 : 30;
+                CurrentScreen = GameScreen.MainMenu;
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.EndArea();
+        }
+
+        // =========================================================================
+        // SCREEN 10: REWARDS (Matches Reference 9)
+        // =========================================================================
+        private void DrawScreen10_RewardScreen(int w, int h)
+        {
+            DrawScreenTag("10. Rewards");
+
+            float cardW = Mathf.Min(600f, w * 0.72f);
+            float cardH = Mathf.Min(380f, h * 0.75f);
+            float cardX = (w - cardW) * 0.5f;
+            float cardY = (h - cardH) * 0.5f;
+
+            GUI.DrawTexture(new Rect(cardX, cardY, cardW, cardH), _darkPanelTex);
+
+            GUILayout.BeginArea(new Rect(cardX + 25, cardY + 25, cardW - 50, cardH - 50));
+
+            GUIStyle winStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 26,
+                fontStyle = FontStyle.Bold
+            };
+            winStyle.normal.textColor = new Color(1.0f, 0.85f, 0.15f);
+            GUILayout.Label("🏆 MISSION COMPLETE! 🏆", winStyle);
+
+            GUILayout.Space(20);
+            GUILayout.Label("+1,000 Silver Coins Credited!", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16 });
+            GUILayout.Label("+500 XP Added to Rider Progression!", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16 });
+
+            GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
+            GUIStyle contStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 17 };
+            contStyle.normal.textColor = Color.black;
+            if (GUILayout.Button("CONTINUE ▶", contStyle, GUILayout.Height(46)))
+            {
+                CurrentScreen = GameScreen.MainMenu;
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.EndArea();
+        }
+
+        // =========================================================================
+        // SCREEN 11: AVATAR STUDIO
+        // =========================================================================
+        private void DrawScreen11_AvatarStudio(int w, int h)
+        {
+            DrawScreenTag("11. Rider Avatar Studio");
+            DrawHeaderWithBack(w, "RIDER AVATAR CUSTOMIZER", () => CurrentScreen = GameScreen.Garage);
+
+            float panelW = Mathf.Min(340f, w * 0.35f);
+            float panelX = w - panelW - 25f;
+            float panelY = 70f;
+
+            GUI.DrawTexture(new Rect(panelX, panelY, panelW, h - panelY - 20), _darkPanelTex);
+
+            GUILayout.BeginArea(new Rect(panelX + 20, panelY + 20, panelW - 40, h - panelY - 40));
+
+            GUILayout.Label("<b>RIDER GENDER:</b>");
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Toggle(!_isFemaleAvatar, "Male", "Button", GUILayout.Height(30)))
+            {
+                _isFemaleAvatar = false;
+                ApplyCustomizationsToBike();
+            }
+            if (GUILayout.Toggle(_isFemaleAvatar, "Female", "Button", GUILayout.Height(30)))
+            {
+                _isFemaleAvatar = true;
+                ApplyCustomizationsToBike();
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(14);
+            GUILayout.Label("<b>RIDING JACKET:</b>");
+            for (int j = 0; j < _jacketNames.Length; j++)
+            {
+                if (GUILayout.Toggle(_selectedJacketIdx == j, _jacketNames[j], "Button"))
+                {
+                    _selectedJacketIdx = j;
+                    ApplyCustomizationsToBike();
+                }
+            }
+
+            GUILayout.Space(14);
+            GUILayout.Label("<b>HELMET COLOR:</b>");
+            for (int hc = 0; hc < _helmetColorNames.Length; hc++)
+            {
+                if (GUILayout.Toggle(_selectedHelmetIdx == hc, _helmetColorNames[hc], "Button"))
+                {
+                    _selectedHelmetIdx = hc;
+                    ApplyCustomizationsToBike();
+                }
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = new Color(1.0f, 0.76f, 0.08f);
+            if (GUILayout.Button("SAVE AVATAR ▶", GUILayout.Height(40)))
             {
                 CurrentScreen = GameScreen.Garage;
             }
-        }
-
-        // =========================================================================
-        // SCREEN 6: MISSIONS (Matches Reference 6. Missions)
-        // =========================================================================
-        private void DrawScreen6_Missions(int w, int h)
-        {
-            DrawScreenTag("6. Missions");
-
-            // Top Bar: [⬅] MISSIONS
-            DrawHeaderBar(w, "MISSIONS", () => CurrentScreen = GameScreen.MainMenu);
-
-            // Left Side: 3D Rider Silhouette / Preview
-            float leftW = Mathf.Min(320f, w * 0.35f);
-            float panelY = 70f;
-            float panelH = h - panelY - 25f;
-
-            GUI.DrawTexture(new Rect(25, panelY, leftW, panelH), _darkPanelTex);
-
-            GUIStyle riderInfo = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 16,
-                fontStyle = FontStyle.Bold
-            };
-            riderInfo.normal.textColor = Color.white;
-            GUI.Label(new Rect(25, panelY + 25, leftW, 30), "🏍️ TOURING MISSIONS", riderInfo);
-
-            GUIStyle rewardBox = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 12 };
-            rewardBox.normal.textColor = new Color(0.85f, 0.85f, 0.85f);
-            GUI.Label(new Rect(25, panelY + 65, leftW, 60), "Complete Indian Highway\nMilestones to earn Silver,\nGold & XP Trophies!", rewardBox);
-
-            // Right Side: Missions Board with Story/Daily/Weekly Tabs (Reference 6)
-            float boardX = 35 + leftW + 10f;
-            float boardW = w - boardX - 25f;
-
-            GUI.DrawTexture(new Rect(boardX, panelY, boardW, panelH), _darkPanelTex);
-
-            // Vertical / Horizontal Tabs: [Story] [Daily] [Weekly]
-            float tabW = 85f;
-            float tabH = 34f;
-            float tabX = boardX + 15f;
-            float tabY = panelY + 12f;
-
-            DrawMissionTab(tabX, tabY, tabW, tabH, "Story", 0);
-            DrawMissionTab(tabX + tabW + 5, tabY, tabW, tabH, "Daily", 1);
-            DrawMissionTab(tabX + (tabW + 5) * 2, tabY, tabW, tabH, "Weekly", 2);
-
-            // Mission Rows (Reference 6)
-            float rowY = panelY + 58f;
-            float rowH = 50f;
-            float rowW = boardW - 30f;
-
-            DrawMissionRow(boardX + 15, rowY, rowW, rowH, "Reach Chennai via NH-44", "0 / 1", "🪙 500", ref _mission1Claimed);
-            rowY += rowH + 10;
-            DrawMissionRow(boardX + 15, rowY, rowW, rowH, "Complete 5 Rides", "0 / 5", "🪙 300", ref _mission2Claimed);
-            rowY += rowH + 10;
-            DrawMissionRow(boardX + 15, rowY, rowW, rowH, "Travel 100 km Tour", "0 / 100", "🪙 1000", ref _mission3Claimed);
-
-            // Bottom Rewards Summary Strip (Reference 6: REWARDS: [XP 500] [🪙 1000] [🎁 Mystery Box])
-            float bottomStripY = panelY + panelH - 55f;
-            GUI.DrawTexture(new Rect(boardX + 15, bottomStripY, rowW, 42), _lightPanelTex);
-
-            GUIStyle rewSummary = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 14,
-                fontStyle = FontStyle.Bold
-            };
-            rewSummary.normal.textColor = Color.white;
-            GUI.Label(new Rect(boardX + 15, bottomStripY, rowW, 42), "REWARDS:   ⭐ XP 500     🪙 1,000 Coins     🎁 Mystery Gift Box", rewSummary);
-        }
-
-        private void DrawMissionTab(float x, float y, float w, float h, string title, int index)
-        {
-            bool isCur = (_missionTab == index);
-            if (isCur)
-            {
-                GUI.DrawTexture(new Rect(x, y, w, h), _goldBtnTex);
-            }
-            else
-            {
-                GUI.DrawTexture(new Rect(x, y, w, h), _lightPanelTex);
-            }
-
-            GUIStyle tStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 13 };
-            tStyle.normal.textColor = isCur ? Color.black : Color.white;
-            if (GUI.Button(new Rect(x, y, w, h), title, tStyle))
-            {
-                _missionTab = index;
-            }
-        }
-
-        private void DrawMissionRow(float x, float y, float w, float h, string missionName, string progress, string reward, ref bool claimed)
-        {
-            GUI.DrawTexture(new Rect(x, y, w, h), _lightPanelTex);
-
-            // Mission Name
-            GUIStyle mStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
-            mStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(x + 15, y + 8, w * 0.45f, 22), missionName, mStyle);
-
-            // Progress & Reward
-            GUIStyle sub = new GUIStyle(GUI.skin.label) { fontSize = 12 };
-            sub.normal.textColor = new Color(0.85f, 0.85f, 0.85f);
-            GUI.Label(new Rect(x + 15, y + 27, w * 0.45f, 18), $"Progress: {progress}   |   Reward: {reward}", sub);
-
-            // Yellow GO Button (Reference 6)
-            float goW = 75f;
-            float goH = 34f;
-            float goX = x + w - goW - 12f;
-            float goY = y + (h - goH) * 0.5f;
-
-            GUI.DrawTexture(new Rect(goX, goY, goW, goH), _goldBtnTex);
-            GUIStyle goStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
-            goStyle.normal.textColor = Color.black;
-
-            if (GUI.Button(new Rect(goX, goY, goW, goH), "GO", goStyle))
-            {
-                claimed = true;
-                CurrentScreen = GameScreen.RewardScreen;
-            }
-        }
-
-        // =========================================================================
-        // SCREEN 7: MULTIPLAYER (Matches Reference 7. Multiplayer)
-        // =========================================================================
-        private void DrawScreen7_Multiplayer(int w, int h)
-        {
-            DrawScreenTag("7. Multiplayer");
-
-            // Top Bar: [⬅] MULTIPLAYER + Green Pill "🟢 Online: 2456" (Reference 7)
-            DrawHeaderBar(w, "MULTIPLAYER", () => CurrentScreen = GameScreen.MainMenu);
-
-            // Green Online Pill
-            float pillW = 140f;
-            float pillX = w - pillW - 25f;
-            GUI.DrawTexture(new Rect(pillX, 12, pillW, 34), _greenBtnTex);
-            GUIStyle pillStyle = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 12,
-                fontStyle = FontStyle.Bold
-            };
-            pillStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(pillX, 12, pillW, 34), "🟢 Online: 2456", pillStyle);
-
-            // 3 Bottom Feature Cards (Reference 7: Online Ride, Create Room, Join Room)
-            float cardSpacing = 20f;
-            float cardW = (w - 50f - cardSpacing * 2) / 3f;
-            float cardH = Mathf.Min(220f, h * 0.44f);
-            float cardY = h - cardH - 85f;
-
-            // Card 1: Online Ride
-            DrawMultiplayerCard(25, cardY, cardW, cardH, "🌐", "Online Ride", "Instant Matchmaking\nNH-44 Express Convoy", "Join Now", () =>
-            {
-                _multiplayerStatus = "Matched with 3 Indian Riders! Convoy starting.";
-                CurrentScreen = GameScreen.RidingHUD;
-            });
-
-            // Card 2: Create Room & Invite
-            DrawMultiplayerCard(25 + cardW + cardSpacing, cardY, cardW, cardH, "👥", "Create Room", $"Host Private 4-Player Convoy\nRoom: {_myGeneratedRoomCode}", "Host & Invite", () =>
-            {
-                _multiplayerStatus = $"Created Room {_myGeneratedRoomCode}! Code copied to clipboard.";
-                GUIUtility.systemCopyBuffer = _myGeneratedRoomCode;
-                _isRoomCodeCopied = true;
-            });
-
-            // Card 3: Join Room
-            DrawMultiplayerCard(25 + (cardW + cardSpacing) * 2, cardY, cardW, cardH, "🚪", "Join Room", "Enter Room Invite Code\nbelow to join friends", "Join Room", () =>
-            {
-                _multiplayerStatus = "Joined Convoy Room " + _roomCodeInput + "!";
-                CurrentScreen = GameScreen.RidingHUD;
-            });
-
-            // Bottom Social Friends & Room Code Invite Bar
-            float barY = h - 70f;
-            GUI.DrawTexture(new Rect(25, barY, w - 50f, 55f), _darkPanelTex);
-
-            GUIStyle invStyle = new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold };
-            invStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(35, barY + 8, 220, 20), $"Invite Code: <b>{_myGeneratedRoomCode}</b>", invStyle);
-
-            if (GUI.Button(new Rect(35, barY + 28, 140, 24), _isRoomCodeCopied ? "✓ CODE COPIED!" : "📋 COPY INVITE CODE"))
-            {
-                GUIUtility.systemCopyBuffer = _myGeneratedRoomCode;
-                _isRoomCodeCopied = true;
-                _multiplayerStatus = $"Room code {_myGeneratedRoomCode} copied! Share with friends to ride together.";
-            }
-
-            // Quick Friend Invites
-            GUI.Label(new Rect(210, barY + 8, 120, 20), "Online Friends:", invStyle);
-            float fx = 320f;
-            for (int f = 0; f < _convoyFriends.Length; f++)
-            {
-                if (fx + 140f > w - 180f) break;
-                if (GUI.Button(new Rect(fx, barY + 12, 135, 30), $"+ {_convoyFriends[f]}"))
-                {
-                    _multiplayerStatus = $"Invited {_convoyFriends[f]} to convoy {_myGeneratedRoomCode}!";
-                }
-                fx += 145f;
-            }
-
-            // Room Code Input on Right
-            float inX = w - 190f;
-            GUI.Label(new Rect(inX, barY + 6, 120, 18), "Enter Room Code:", invStyle);
-            _roomCodeInput = GUI.TextField(new Rect(inX, barY + 26, 155, 24), _roomCodeInput);
-
-            // Status message
-            GUIStyle statStyle = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 13,
-                fontStyle = FontStyle.Bold
-            };
-            statStyle.normal.textColor = new Color(1f, 0.85f, 0.2f);
-            GUI.Label(new Rect(0, cardY - 32, w, 24), _multiplayerStatus, statStyle);
-        }
-
-        private void DrawMultiplayerCard(float x, float y, float w, float h, string icon, string title, string desc, string btnText, Action onAction)
-        {
-            GUI.DrawTexture(new Rect(x, y, w, h), _darkPanelTex);
-
-            GUILayout.BeginArea(new Rect(x + 12, y + 14, w - 24, h - 28));
-
-            GUIStyle icStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 28 };
-            GUILayout.Label(icon, icStyle);
-
-            GUIStyle tStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold };
-            tStyle.normal.textColor = Color.white;
-            GUILayout.Label(title, tStyle);
-
-            GUIStyle dStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 11 };
-            dStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
-            GUILayout.Label(desc, dStyle);
-
-            GUILayout.FlexibleSpace();
-
-            // Yellow Button (Reference 7)
-            GUI.DrawTexture(GUILayoutUtility.GetRect(w - 24, 38), _goldBtnTex);
-            GUIStyle btnStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
-            btnStyle.normal.textColor = Color.black;
-
-            if (GUI.Button(GUILayoutUtility.GetLastRect(), btnText, btnStyle))
-            {
-                onAction?.Invoke();
-            }
+            GUI.backgroundColor = Color.white;
 
             GUILayout.EndArea();
         }
 
         // =========================================================================
-        // SCREEN 8: SETTINGS (Matches Reference 8. Settings)
-        // =========================================================================
-        private void DrawScreen8_Settings(int w, int h)
-        {
-            DrawScreenTag("8. Settings");
-
-            // Top Bar: [⬅] SETTINGS
-            DrawHeaderBar(w, "SETTINGS", () => CurrentScreen = GameScreen.MainMenu);
-
-            float panelY = 70f;
-            float panelH = h - panelY - 25f;
-
-            // Left Category Tabs: Graphics, Audio, Controls, Language, Account (Reference 8)
-            float tabListW = Mathf.Min(220f, w * 0.26f);
-            GUI.DrawTexture(new Rect(25, panelY, tabListW, panelH), _darkPanelTex);
-
-            float tabBtnH = 44f;
-            float ty = panelY + 12f;
-
-            DrawSettingsTabBtn(35, ty, tabListW - 20, tabBtnH, "🖥️ Graphics", 0);
-            ty += tabBtnH + 6;
-            DrawSettingsTabBtn(35, ty, tabListW - 20, tabBtnH, "🔊 Audio", 1);
-            ty += tabBtnH + 6;
-            DrawSettingsTabBtn(35, ty, tabListW - 20, tabBtnH, "🎮 Controls", 2);
-            ty += tabBtnH + 6;
-            DrawSettingsTabBtn(35, ty, tabListW - 20, tabBtnH, "🌐 Language", 3);
-            ty += tabBtnH + 6;
-            DrawSettingsTabBtn(35, ty, tabListW - 20, tabBtnH, "👤 Account", 4);
-
-            // Right Settings Configuration Panel (Reference 8)
-            float setW = w - tabListW - 65f;
-            float setX = 35 + tabListW + 10f;
-            GUI.DrawTexture(new Rect(setX, panelY, setW, panelH), _darkPanelTex);
-
-            GUILayout.BeginArea(new Rect(setX + 20, panelY + 16, setW - 40, panelH - 32));
-
-            switch (_settingsTab)
-            {
-                case 0: DrawSettingsGraphics(); break;
-                case 1: DrawSettingsAudio(); break;
-                case 2: DrawSettingsControls(); break;
-                case 3: DrawSettingsLanguage(); break;
-                case 4: DrawSettingsAccount(); break;
-            }
-
-            GUILayout.FlexibleSpace();
-
-            // Bottom Right Yellow [Apply] Button (Reference 8)
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
-            GUIStyle appStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
-            appStyle.normal.textColor = Color.black;
-            if (GUILayout.Button("Apply", appStyle, GUILayout.Width(130), GUILayout.Height(38)))
-            {
-                ApplySettingsChanges();
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndArea();
-        }
-
-        private void DrawSettingsTabBtn(float x, float y, float w, float h, string title, int index)
-        {
-            bool isCur = (_settingsTab == index);
-            if (isCur)
-            {
-                GUI.DrawTexture(new Rect(x, y, w, h), _goldBtnTex);
-            }
-            else
-            {
-                GUI.DrawTexture(new Rect(x, y, w, h), _lightPanelTex);
-            }
-
-            GUIStyle btnStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 13 };
-            btnStyle.normal.textColor = isCur ? Color.black : Color.white;
-            if (GUI.Button(new Rect(x, y, w, h), title, btnStyle))
-            {
-                _settingsTab = index;
-            }
-        }
-
-        private void DrawSettingsGraphics()
-        {
-            // Graphics Quality: [Low] [Medium] [High] [Ultra] (Reference 8)
-            GUILayout.Label("<b>Graphics Quality:</b>");
-            GUILayout.BeginHorizontal();
-            string[] qNames = new[] { "Low", "Medium", "High", "Ultra" };
-            for (int q = 0; q < qNames.Length; q++)
-            {
-                bool isQ = (_graphicsQualityIndex == q);
-                GUI.backgroundColor = isQ ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-                if (GUILayout.Button(qNames[q], GUILayout.Height(32)))
-                {
-                    _graphicsQualityIndex = q;
-                }
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(14);
-
-            // Frame Rate: [30 FPS] [60 FPS] (Reference 8)
-            GUILayout.Label("<b>Frame Rate:</b>");
-            GUILayout.BeginHorizontal();
-            GUI.backgroundColor = (_frameRateIndex == 0) ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("30 FPS", GUILayout.Width(110), GUILayout.Height(32))) _frameRateIndex = 0;
-
-            GUI.backgroundColor = (_frameRateIndex == 1) ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("60 FPS", GUILayout.Width(110), GUILayout.Height(32))) _frameRateIndex = 1;
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(14);
-
-            // Bloom Switch (Reference 8)
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Bloom:", GUILayout.Width(140));
-            GUI.backgroundColor = _bloomEnabled ? new Color(0.2f, 0.8f, 0.35f) : Color.gray;
-            if (GUILayout.Button(_bloomEnabled ? "ON" : "OFF", GUILayout.Width(80), GUILayout.Height(28)))
-            {
-                _bloomEnabled = !_bloomEnabled;
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(8);
-
-            // Shadows Switch (Reference 8)
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Shadows:", GUILayout.Width(140));
-            GUI.backgroundColor = _shadowsEnabled ? new Color(0.2f, 0.8f, 0.35f) : Color.gray;
-            if (GUILayout.Button(_shadowsEnabled ? "ON" : "OFF", GUILayout.Width(80), GUILayout.Height(28)))
-            {
-                _shadowsEnabled = !_shadowsEnabled;
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-        }
-
-        private void DrawSettingsAudio()
-        {
-            GUILayout.Label("<b>Master Volume:</b>");
-            _masterVolume = GUILayout.HorizontalSlider(_masterVolume, 0f, 1f);
-
-            GUILayout.Space(10);
-            GUILayout.Label("<b>350cc Engine Thump Volume:</b>");
-            _engineVolume = GUILayout.HorizontalSlider(_engineVolume, 0f, 1f);
-
-            GUILayout.Space(10);
-            GUILayout.Label("<b>Roots Vibrosonic Horn Volume:</b>");
-            _hornVolume = GUILayout.HorizontalSlider(_hornVolume, 0f, 1f);
-        }
-
-        private void DrawSettingsControls()
-        {
-            GUILayout.Label("<b>Control Scheme for Android / PC:</b>");
-            GUILayout.Box("✓ On-Screen Mobile Touch HUD (Gas, Brake, Steer, Horn, Nitro)\n✓ Keyboard Support (W, A, S, D, Space, Shift, H)\n✓ Accelerometer Tilt Steering Supported");
-        }
-
-        private void DrawSettingsLanguage()
-        {
-            GUILayout.Label("<b>Select Game Language:</b>");
-            GUILayout.BeginHorizontal();
-            GUI.backgroundColor = (_selectedLanguageIndex == 0) ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("English (Default)", GUILayout.Height(36))) _selectedLanguageIndex = 0;
-
-            GUI.backgroundColor = (_selectedLanguageIndex == 1) ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("தமிழ் (Tamil)", GUILayout.Height(36))) _selectedLanguageIndex = 1;
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-        }
-
-        private void DrawSettingsAccount()
-        {
-            GUILayout.Label("<b>Player Authentication & Account:</b>");
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Email:", GUILayout.Width(80));
-            _loginEmail = GUILayout.TextField(_loginEmail, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Password:", GUILayout.Width(80));
-            _loginPassword = GUILayout.PasswordField(_loginPassword, '*', GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(8);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("🔑 Login", GUILayout.Width(100), GUILayout.Height(30)))
-            {
-                _authManager.LoginWithEmail(_loginEmail, _loginPassword, (ok, msg) => _authMessage = msg);
-            }
-            if (GUILayout.Button("⚡ 1-Click Guest Login", GUILayout.Width(160), GUILayout.Height(30)))
-            {
-                _authManager.LoginAsGuest((ok, msg) => _authMessage = msg);
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.Label($"Status: {_authMessage}");
-        }
-
-        private void ApplySettingsChanges()
-        {
-            QualitySettings.SetQualityLevel(Mathf.Clamp(_graphicsQualityIndex, 0, 2), true);
-            Application.targetFrameRate = (_frameRateIndex == 0) ? 30 : 60;
-        }
-
-        // =========================================================================
-        // SCREEN 9: REWARD SCREEN (Matches Reference 9. Reward Screen)
-        // =========================================================================
-        private void DrawScreen9_RewardScreen(int w, int h)
-        {
-            DrawScreenTag("9. Reward Screen");
-
-            // Dark Festive Background
-            GUI.Box(new Rect(0, 0, w, h), "");
-
-            // Golden Winged Crest Banner: "MISSION COMPLETE!" (Reference 9)
-            GUIStyle crestStyle = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Max(30, h * 50 / 1000),
-                fontStyle = FontStyle.Bold
-            };
-            crestStyle.normal.textColor = new Color(1.0f, 0.82f, 0.18f); // Golden Glowing Yellow
-            GUI.Label(new Rect(0, h * 0.18f, w, 55), "🦅  MISSION COMPLETE!  🦅", crestStyle);
-
-            // 3 Center Reward Cards: [+1000 Coins] [+500 XP] [New Bike Unlocked] (Reference 9)
-            float totalCardsW = Mathf.Min(660f, w * 0.78f);
-            float cardSpacing = 16f;
-            float cW = (totalCardsW - cardSpacing * 2) / 3f;
-            float cardH = 145f;
-            float cardX = (w - totalCardsW) * 0.5f;
-            float cardY = h * 0.38f;
-
-            // Card 1: Gold Coin Stack +1000 Coins
-            GUI.DrawTexture(new Rect(cardX, cardY, cW, cardH), _darkPanelTex);
-            GUIStyle rwVal = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 28 };
-            GUI.Label(new Rect(cardX, cardY + 15, cW, 35), "🪙🪙", rwVal);
-            GUIStyle rwT1 = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold };
-            rwT1.normal.textColor = new Color(1.0f, 0.82f, 0.18f);
-            GUI.Label(new Rect(cardX, cardY + 60, cW, 25), "+1000", rwT1);
-            GUIStyle rwSub = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 12 };
-            rwSub.normal.textColor = Color.gray;
-            GUI.Label(new Rect(cardX, cardY + 88, cW, 20), "Coins", rwSub);
-
-            // Card 2: Blue Star +500 XP
-            float cx2 = cardX + cW + cardSpacing;
-            GUI.DrawTexture(new Rect(cx2, cardY, cW, cardH), _darkPanelTex);
-            GUI.Label(new Rect(cx2, cardY + 15, cW, 35), "⭐", rwVal);
-            GUIStyle rwT2 = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold };
-            rwT2.normal.textColor = new Color(0.2f, 0.85f, 1.0f);
-            GUI.Label(new Rect(cx2, cardY + 60, cW, 25), "+500", rwT2);
-            GUI.Label(new Rect(cx2, cardY + 88, cW, 20), "XP", rwSub);
-
-            // Card 3: New Bike Unlocked
-            float cx3 = cardX + (cW + cardSpacing) * 2;
-            GUI.DrawTexture(new Rect(cx3, cardY, cW, cardH), _darkPanelTex);
-            GUI.Label(new Rect(cx3, cardY + 15, cW, 35), "🏍️", rwVal);
-            GUIStyle rwT3 = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 14, fontStyle = FontStyle.Bold };
-            rwT3.normal.textColor = Color.white;
-            GUI.Label(new Rect(cx3, cardY + 60, cW, 25), "New Bike", rwT3);
-            GUI.Label(new Rect(cx3, cardY + 88, cW, 20), "Unlocked", rwSub);
-
-            // Big Yellow CTA Button: Continue ▶ (Reference 9)
-            float conW = Mathf.Min(260f, w * 0.35f);
-            float conH = 48f;
-            float conX = (w - conW) * 0.5f;
-            float conY = cardY + cardH + 35f;
-
-            GUI.DrawTexture(new Rect(conX, conY, conW, conH), _goldBtnTex);
-            GUIStyle conStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 17 };
-            conStyle.normal.textColor = Color.black;
-
-            if (GUI.Button(new Rect(conX, conY, conW, conH), "Continue ▶", conStyle))
-            {
-                // Credit rewards to player wallet
-                _silverCoins += 1000;
-                _economyManager?.AddCurrency(CurrencyType.SilverCoins, 1000, "Mission Complete Reward");
-                CurrentScreen = GameScreen.MainMenu;
-            }
-        }
-
-        // =========================================================================
-        // SHARED UI HELPERS & NAVIGATION
+        // HELPERS & PROCEDURAL DRAWERS
         // =========================================================================
         private void DrawScreenTag(string label)
         {
@@ -1408,171 +1524,67 @@ namespace IndianBikeLife.Core.UI
                 fontSize = 11,
                 fontStyle = FontStyle.Bold
             };
-            tagStyle.normal.textColor = new Color(1.0f, 0.85f, 0.20f); // Yellow tag
-            GUI.Label(new Rect(15, 4, 250, 18), label, tagStyle);
+            tagStyle.normal.textColor = new Color(1f, 1f, 1f, 0.50f);
+            GUI.Label(new Rect(8, 2, 220, 18), label, tagStyle);
         }
 
-        private void DrawHeaderBar(int w, string title, Action onBack)
+        private void DrawHeaderWithBack(int w, string title, Action onBack)
         {
-            // Blue Header Bar (Reference 3, 4, 6, 7, 8)
-            GUI.DrawTexture(new Rect(0, 0, w, 52), _blueHeaderTex);
+            float headerH = 46f;
+            GUI.DrawTexture(new Rect(0, 0, w, headerH), _blueHeaderTex);
 
-            // Blue Square Back Button [ ⬅ ]
-            if (GUI.Button(new Rect(12, 10, 44, 32), "⬅"))
+            if (GUI.Button(new Rect(15, 8, 80, 30), "◀ BACK"))
             {
                 onBack?.Invoke();
             }
 
-            // Title
-            GUIStyle tStyle = new GUIStyle(GUI.skin.label)
+            GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 17,
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 16,
                 fontStyle = FontStyle.Bold
             };
-            tStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(68, 14, 250, 26), title, tStyle);
+            titleStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(100, 8, w - 200, 30), title, titleStyle);
         }
 
         private void DrawTopWallet(int w)
         {
-            float wx = w - 240f;
-            GUI.DrawTexture(new Rect(wx, 12, 185, 34), _darkPanelTex);
+            float wallW = 200f;
+            float wallX = w - wallW - 20f;
+            GUI.DrawTexture(new Rect(wallX, 8, wallW, 30), _darkPanelTex);
 
-            GUIStyle wStyle = new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold };
-            wStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(wx + 10, 19, 175, 20), $"🪙 {_silverCoins}    💰 {_goldCoins}", wStyle);
-
-            // Plus Button [+]
-            GUI.backgroundColor = new Color(0.12f, 0.75f, 0.35f);
-            if (GUI.Button(new Rect(wx + 155, 15, 24, 26), "+"))
-            {
-                _silverCoins += 500;
-                _economyManager?.AddCurrency(CurrencyType.SilverCoins, 500, "Bonus Coins");
-            }
-            GUI.backgroundColor = Color.white;
+            GUIStyle coinStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 12 };
+            coinStyle.normal.textColor = new Color(1f, 0.85f, 0.2f);
+            GUI.Label(new Rect(wallX + 12, 12, wallW - 24, 22), $"🪙 {_silverCoins:N0}   💎 {_diamonds:N0}", coinStyle);
         }
 
-        private void DrawMenuNavButton(float x, float y, float w, float h, string title, Action onClick)
+        private void DrawSpecBar(string specName, float value)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(specName, GUILayout.Width(75));
+
+            Rect r = GUILayoutUtility.GetRect(140, 16);
+            GUI.DrawTexture(r, _darkPanelTex);
+            GUI.DrawTexture(new Rect(r.x, r.y, r.width * Mathf.Clamp01(value), r.height), _barFillTex);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(4);
+        }
+
+        private void DrawMenuNavButton(float x, float y, float w, float h, string label, Action onClick)
         {
             GUI.DrawTexture(new Rect(x, y, w, h), _darkPanelTex);
             GUIStyle btnStyle = new GUIStyle(GUI.skin.button)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fontSize = 14,
+                fontSize = 13,
                 fontStyle = FontStyle.Bold
             };
             btnStyle.normal.textColor = Color.white;
-
-            if (GUI.Button(new Rect(x, y, w, h), "   " + title, btnStyle))
+            if (GUI.Button(new Rect(x, y, w, h), $"  {label}", btnStyle))
             {
                 onClick?.Invoke();
             }
-        }
-
-        // =========================================================================
-        // SCREEN 10: AVATAR & RIDER STUDIO
-        // =========================================================================
-        private void DrawScreen10_AvatarStudio(int w, int h)
-        {
-            DrawScreenTag("10. Rider Avatar Studio");
-            DrawHeaderBar(w, "RIDER AVATAR & ATTIRE", () => CurrentScreen = GameScreen.Garage);
-            DrawTopWallet(w);
-
-            float panelW = Mathf.Min(340f, w * 0.38f);
-            float panelX = w - panelW - 25f;
-            float panelY = 70f;
-            float panelH = h - panelY - 30f;
-
-            GUI.DrawTexture(new Rect(panelX, panelY, panelW, panelH), _darkPanelTex);
-            GUILayout.BeginArea(new Rect(panelX + 16, panelY + 16, panelW - 32, panelH - 32));
-
-            GUIStyle titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold };
-            titleStyle.normal.textColor = new Color(1f, 0.78f, 0.12f);
-            GUILayout.Label("👤 RIDER CUSTOMIZATION", titleStyle);
-            GUILayout.Space(10);
-
-            // Gender Selection
-            GUILayout.Label("<b>Rider Character Gender:</b>");
-            GUILayout.BeginHorizontal();
-            GUI.backgroundColor = !_isFemaleAvatar ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("👨 MALE RIDER", GUILayout.Height(34)))
-            {
-                _isFemaleAvatar = false;
-                ApplyCustomizationsToBike();
-            }
-            GUI.backgroundColor = _isFemaleAvatar ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-            if (GUILayout.Button("👩 FEMALE RIDER", GUILayout.Height(34)))
-            {
-                _isFemaleAvatar = true;
-                ApplyCustomizationsToBike();
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(12);
-
-            // Jacket Color Selection
-            GUILayout.Label("<b>Leather Riding Jacket:</b>");
-            for (int j = 0; j < _jacketNames.Length; j++)
-            {
-                bool isSel = (_selectedJacketIdx == j);
-                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-                if (GUILayout.Button($"🧥 {_jacketNames[j]}", GUILayout.Height(28)))
-                {
-                    _selectedJacketIdx = j;
-                    ApplyCustomizationsToBike();
-                }
-            }
-            GUI.backgroundColor = Color.white;
-
-            GUILayout.Space(12);
-
-            // Helmet Style Selection
-            GUILayout.Label("<b>Helmet Selection:</b>");
-            string[] styles = { "🪖 Full-Face Sport", "🪖 Classic Retro Open", "🪖 Motocross Peak Visor" };
-            for (int hs = 0; hs < styles.Length; hs++)
-            {
-                bool isSel = (_selectedHelmetStyle == hs);
-                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-                if (GUILayout.Button(styles[hs], GUILayout.Height(28)))
-                {
-                    _selectedHelmetStyle = hs;
-                    ApplyCustomizationsToBike();
-                }
-            }
-            GUI.backgroundColor = Color.white;
-
-            GUILayout.Space(12);
-
-            // Helmet Color Selection
-            GUILayout.Label("<b>Helmet Color:</b>");
-            GUILayout.BeginHorizontal();
-            for (int hc = 0; hc < _helmetColorNames.Length; hc++)
-            {
-                bool isSel = (_selectedHelmetIdx == hc);
-                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
-                if (GUILayout.Button(_helmetColorNames[hc], GUILayout.Height(28)))
-                {
-                    _selectedHelmetIdx = hc;
-                    ApplyCustomizationsToBike();
-                }
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
-            GUIStyle saveStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
-            saveStyle.normal.textColor = Color.black;
-            if (GUILayout.Button("SAVE & RETURN ▶", saveStyle, GUILayout.Height(42)))
-            {
-                ApplyCustomizationsToBike();
-                CurrentScreen = GameScreen.Garage;
-            }
-            GUI.backgroundColor = Color.white;
-
-            GUILayout.EndArea();
         }
 
         private void ApplyCustomizationsToBike()

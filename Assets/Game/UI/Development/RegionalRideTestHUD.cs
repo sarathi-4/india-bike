@@ -72,9 +72,9 @@ namespace IndianBikeLife.Core.UI.Development
 
         private void OnGUI()
         {
-            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null && IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen)
+            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null)
             {
-                return; // Suppress debug HUD while player is in Master Game Flow UI
+                return; // Suppress debug HUD completely - MasterGameFlowUI renders the unified 9-screen AAA experience
             }
 
             if (GUI.Button(new Rect(15, 88, 110, 26), _showHUD ? "✖ Close Tools" : "🛠️ Debug Tools"))

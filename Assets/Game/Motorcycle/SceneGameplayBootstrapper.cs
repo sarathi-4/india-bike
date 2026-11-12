@@ -44,11 +44,22 @@ namespace IndianBikeLife.Motorcycle
                 bikeObj.transform.position = new Vector3(0f, 0.5f, 5f);
             }
 
+            // Enforce uniform 1:1 scale on player motorcycle
+            bikeObj.transform.localScale = Vector3.one;
+
             // Remove any legacy BoxCollider that blocks the CharacterController
             var legacyBox = bikeObj.GetComponent<BoxCollider>();
             if (legacyBox != null)
             {
-                Destroy(legacyBox);
+                legacyBox.enabled = false;
+                DestroyImmediate(legacyBox);
+            }
+
+            // Hide legacy untextured passenger seat anchor
+            var oldSeat = bikeObj.transform.Find("PassengerSeatAnchor");
+            if (oldSeat != null)
+            {
+                oldSeat.gameObject.SetActive(false);
             }
 
             // Ensure CharacterController
@@ -59,6 +70,8 @@ namespace IndianBikeLife.Motorcycle
                 cc.center = new Vector3(0f, 0.75f, 0f);
                 cc.radius = 0.45f;
                 cc.height = 1.5f;
+                cc.stepOffset = 0.5f;
+                cc.slopeLimit = 65f;
             }
 
             // Ensure AudioSource
@@ -130,6 +143,13 @@ namespace IndianBikeLife.Motorcycle
             {
                 GameObject menuObj = new GameObject("[Master_Game_Flow_UI]");
                 masterMenu = menuObj.AddComponent<IndianBikeLife.Core.UI.MasterGameFlowUI>();
+            }
+
+            // Suppress legacy developer HUD overlay
+            var legacyDevHUD = FindFirstObjectByType<IndianBikeLife.UI.Development.RegionalRideTestHUD>();
+            if (legacyDevHUD != null)
+            {
+                legacyDevHUD.enabled = false;
             }
 
             // Reposition motorcycle properly aligned along the curved road surface
