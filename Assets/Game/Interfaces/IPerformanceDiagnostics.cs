@@ -32,3 +32,4 @@ namespace IndianBikeLife.Core.Interfaces
         void ToggleOverlay();
     }
 }
+

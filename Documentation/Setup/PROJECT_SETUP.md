@@ -107,3 +107,4 @@ The project is pre-configured for Android. To verify:
 5. Click **Build and Run**.
 6. Select an output APK filename (e.g., `IndianBikeLife_Stage1.apk`).
 7. Unity will compile via IL2CPP and deploy the package directly to your Android device.
+

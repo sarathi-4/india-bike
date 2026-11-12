@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c6d3bc89115b9c0ba9e02c525f2ee3, type: 3}
+  m_Name: Off-Road Ride
+  _modeType: 6
+  _modeTitle: Off-Road Ride
+  _description: Dirt trails, gravel, rugged terrain
+  _theme: 5
+  _surfaceType: 5
+  _trafficDensity: 0
+  _defaultHourOfDay: 16
+  _enableRainByDefault: 0
+  _requiresPassenger: 0
+  _recommendedMotorcycle: Xpulse 200 4V
+  _isImplementedInStage2: 1

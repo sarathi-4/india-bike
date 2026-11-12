@@ -14,4 +14,7 @@ EditorBuildSettings:
   - m_Enabled: 1
     m_Path: Assets/Scenes/MainMenu.unity
     m_Guid: e0000000000000000000000000000003
+  - m_Enabled: 1
+    m_Path: Assets/Scenes/RegionalRideTest.unity
+    m_Guid: e0000000000000000000000000000004
   m_configObjects: {}

@@ -41,3 +41,4 @@ namespace IndianBikeLife.Core.Interfaces
         void SetVirtualAction(InputActionType action, bool isPressed);
     }
 }
+

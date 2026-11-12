@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bbf3f07be807e3bc57b295c25ba47ba, type: 3}
+  m_Name: RidingModeCatalogue
+  _modes:
+  - {fileID: 11400000, guid: ed36374417ea5eeb64fe6d6dab9c6d77, type: 2}
+  - {fileID: 11400000, guid: e5d4e7467eb8483d3d4148e9a777a4a9, type: 2}
+  - {fileID: 11400000, guid: e85671ac5b80472a0b7f0af676b974b9, type: 2}
+  - {fileID: 11400000, guid: 5b4b3b19a3f91ff04998d4c917b7aca9, type: 2}
+  - {fileID: 11400000, guid: 7a1199013f2c333df5334e64c8f30d57, type: 2}
+  - {fileID: 11400000, guid: 4ff903f73355249e8ae1996b5d265ef6, type: 2}
+  - {fileID: 11400000, guid: 484053e00c1e28762252a5dc1d553812, type: 2}
+  - {fileID: 11400000, guid: 0d4b9776d88ea6259fc9309a4fde264f, type: 2}
+  - {fileID: 11400000, guid: ec616e294f9a2978a8ec62a219b0360c, type: 2}
+  - {fileID: 11400000, guid: 79e12f50156eb98edca0630df7fb170e, type: 2}

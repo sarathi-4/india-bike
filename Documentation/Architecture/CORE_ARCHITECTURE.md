@@ -175,3 +175,4 @@ The loading pipeline is engineered to ensure seamless user experience on Android
 ### Stage 5: Cloud Saves & Social Features
 1. Implement `ICloudSaveProvider` (e.g., `GooglePlayGamesCloudSaveProvider`).
 2. Pass it into `SaveManager` without altering existing disk save logic.
+

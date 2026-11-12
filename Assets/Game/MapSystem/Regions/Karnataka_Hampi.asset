@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ce818f97737f6214f1a3b9ec17b23f2, type: 3}
+  m_Name: Hampi Boulder Highway
+  _destinationId: hampi_ruins
+  _destinationName: Hampi Boulder Highway
+  _description: Ancient UNESCO stone temples and granite boulders
+  _primaryEnvironment: 5
+  _elevationMeters: 467
+  _distanceFromStateCapitalKm: 340
+  _worldAnchorPosition: {x: 0, y: 46.7, z: 3400}
+  _sceneName: RegionalRideTest
+  _isPlayableInStage2: 1
+  _recommendedBikes: Classic 350, Himalayan, Duke 390

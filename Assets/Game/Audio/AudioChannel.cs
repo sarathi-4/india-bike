@@ -13,3 +13,4 @@ namespace IndianBikeLife.Core.Audio
         UI = 5          // Button clicks, purchase chimes, menu navigations
     }
 }
+

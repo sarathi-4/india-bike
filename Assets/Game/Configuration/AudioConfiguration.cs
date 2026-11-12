@@ -66,3 +66,4 @@ namespace IndianBikeLife.Core.Configuration
         }
     }
 }
+

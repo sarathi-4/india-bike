@@ -12,3 +12,4 @@ namespace IndianBikeLife.Core.Utilities.Logger
         None = 4
     }
 }
+

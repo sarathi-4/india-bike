@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9978a88b71bdb5eed4b4cef5a33b4a, type: 3}
+  m_Name: Ananya
+  _passengerId: passenger_ananya
+  _displayName: Ananya
+  _gender: 1
+  _outfitStyle: Leather Touring Jacket
+  _hasHelmet: 1
+  _helmetStyle: White Graphic Visor
+  _accessories: Camera Sling
+  _clothingTint: {r: 0.95, g: 0.75, b: 0.2, a: 1}
+  _preferredHoldStyle: 0
+  _weightKg: 52
+  _leanReactionMultiplier: 1.1

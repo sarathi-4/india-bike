@@ -69,3 +69,4 @@ namespace IndianBikeLife.Core.Interfaces
         void RestoreFromSaveData(SaveData data);
     }
 }
+

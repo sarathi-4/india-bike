@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9978a88b71bdb5eed4b4cef5a33b4a, type: 3}
+  m_Name: Priya
+  _passengerId: passenger_priya
+  _displayName: Priya
+  _gender: 1
+  _outfitStyle: Casual Kurti & Jeans
+  _hasHelmet: 1
+  _helmetStyle: Glossy Crimson Full-Face
+  _accessories: College Backpack
+  _clothingTint: {r: 0.9, g: 0.25, b: 0.35, a: 1}
+  _preferredHoldStyle: 0
+  _weightKg: 54
+  _leanReactionMultiplier: 1.05

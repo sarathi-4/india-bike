@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3684a325163cec9d2d00a25d1c315bf2, type: 3}
+  m_Name: WeatherConfiguration
+  _settings:
+  - weatherType: 0
+    rainEmissionRate: 0
+    fogDensity: 0.003
+    fogColor: {r: 0.7, g: 0.8, b: 0.9, a: 1}
+    windSpeedMps: 2.5
+    roadGripModifier: 1.0
+    hasThunder: 0
+    cloudAlpha: 0.1
+  - weatherType: 1
+    rainEmissionRate: 0
+    fogDensity: 0.008
+    fogColor: {r: 0.65, g: 0.7, b: 0.75, a: 1}
+    windSpeedMps: 4.5
+    roadGripModifier: 0.95
+    hasThunder: 0
+    cloudAlpha: 0.5
+  - weatherType: 3
+    rainEmissionRate: 150
+    fogDensity: 0.015
+    fogColor: {r: 0.55, g: 0.6, b: 0.65, a: 1}
+    windSpeedMps: 6.0
+    roadGripModifier: 0.80
+    hasThunder: 0
+    cloudAlpha: 0.7
+  - weatherType: 4
+    rainEmissionRate: 500
+    fogDensity: 0.025
+    fogColor: {r: 0.45, g: 0.5, b: 0.55, a: 1}
+    windSpeedMps: 10.0
+    roadGripModifier: 0.65
+    hasThunder: 0
+    cloudAlpha: 0.9
+  - weatherType: 5
+    rainEmissionRate: 750
+    fogDensity: 0.030
+    fogColor: {r: 0.35, g: 0.4, b: 0.45, a: 1}
+    windSpeedMps: 15.0
+    roadGripModifier: 0.60
+    hasThunder: 1
+    cloudAlpha: 0.95
+  - weatherType: 6
+    rainEmissionRate: 0
+    fogDensity: 0.045
+    fogColor: {r: 0.75, g: 0.8, b: 0.85, a: 1}
+    windSpeedMps: 1.5
+    roadGripModifier: 0.90
+    hasThunder: 0
+    cloudAlpha: 0.8

@@ -62,3 +62,4 @@ namespace IndianBikeLife.Core.Events.ScriptableEvents
         }
     }
 }
+

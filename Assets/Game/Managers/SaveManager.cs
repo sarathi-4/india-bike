@@ -269,3 +269,4 @@ namespace IndianBikeLife.Core.Managers
         }
     }
 }
+

@@ -22,3 +22,4 @@ namespace IndianBikeLife.Core.Interfaces
         void Shutdown();
     }
 }
+

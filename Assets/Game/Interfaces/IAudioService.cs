@@ -54,3 +54,4 @@ namespace IndianBikeLife.Core.Interfaces
         bool IsChannelMuted(AudioChannel channel);
     }
 }
+

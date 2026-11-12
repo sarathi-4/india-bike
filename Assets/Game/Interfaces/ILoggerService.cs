@@ -39,3 +39,4 @@ namespace IndianBikeLife.Core.Interfaces
         void LogException(string tag, Exception exception);
     }
 }
+

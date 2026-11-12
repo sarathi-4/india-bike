@@ -1,18 +1,26 @@
-# Indian Bike Life — Stage 1: Core Game Architecture
+# Indian Bike Life — Master Architecture & Systems
 
-Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation game set across the vibrant highways, congested city streets, and scenic rural landscapes of India.
-
-This repository represents **Stage 1: Core Game Architecture**, establishing an enterprise-grade, highly modular, scalable foundation engineered specifically for mobile performance and future gameplay expansions.
+Welcome to **Indian Bike Life**, a premium Android-only 3D motorcycle simulation game set across the vibrant highways, congested city streets, hill station ghat roads, and scenic rural landscapes of India.
 
 ---
 
-## 1. Project Purpose
+## 1. Project Overview & Progress
 
-The primary objective of Stage 1 is to build the core foundation without coupling features together into a monolithic structure. Future systems—such as motorcycle physics, showroom customization, traffic AI, dynamic weather, Indian road streaming, missions, character customization, and multiplayer—will integrate cleanly via decoupled interfaces, the centralized Service Locator, and the event architecture.
+- **Stage 1 (Parts 1–14)**: Core Game Architecture, Service Locator, Event Bus, Async Scene Loading, Save System, Audio Foundation, Input Contracts, and Android URP Configuration.
+- **Stage 2 (Parts 15–23)**: Passengers, Indian Maps & Environment Systems.
+  - **Part 15**: Passenger Riding System (Two-person riding, procedural lean, inertia pitch, seat positioning, cameras).
+  - **Part 16**: Indian Map System (28 States + 8 Union Territories catalogue, 5 priority states, chunk streaming).
+  - **Part 17**: Real Road System (Procedural splines, left-hand traffic, intersections, surface friction properties).
+  - **Part 18**: Navigation System (Turn-by-turn guidance, distance & time estimation, checkpoints, GPS simulator).
+  - **Part 19**: Environment System (Indian dhabas, tea stalls, temples, bus stops, palms, banyans, LOD controller).
+  - **Part 20**: Traffic AI System (Auto-rickshaws, buses, trucks, cars, scooters, collision avoidance, traffic lights).
+  - **Part 21**: 10 Selectable Riding Modes (Village, City, Highway, Hill Station, Long-Distance, Free Ride, Off-Road, Night, Race Track, Couple Ride).
+  - **Part 22**: Dynamic Weather System (Sunny, Rainy, Thunderstorm, Fog, Wind, dynamic wet road grip modifier).
+  - **Part 23**: Day/Night & Seasons (Sun/moon cycle, night streetlighting, Indian seasonal variations: Summer, Monsoon, Winter).
 
 ---
 
-## 2. Technical Specifications & Environment
+## 2. Technical Specifications & Target Platform
 
 | Parameter | Specification |
 | :--- | :--- |
@@ -26,88 +34,50 @@ The primary objective of Stage 1 is to build the core foundation without couplin
 | **Default Orientation** | Landscape (Sensor Landscape Left & Right) |
 | **Render Pipeline** | Universal Render Pipeline (URP 14.x+) |
 | **Target Frame Rate** | 60 FPS (Fidelity/Balanced) / 30 FPS (Battery Saver) |
-| **Unity Version Target** | **Unity 2022.3 LTS** (e.g. 2022.3.20f1+) or Unity 6 LTS |
+| **Unity Version Target** | **Unity 2022.3 LTS** (or Unity 6 LTS) |
 
 ---
 
-## 3. Required Unity Packages
+## 3. Scenes in Build
 
-The project manifest (`Packages/manifest.json`) is configured with the following packages:
-
-- **Universal Render Pipeline (`com.unity.render-pipelines.universal`)**: Mobile-optimized forward rendering with single-pass lights.
-- **Unity New Input System (`com.unity.inputsystem`)**: Modern touch, tilt, and gamepad device handling.
-- **TextMeshPro (`com.unity.textmeshpro`)**: Crisp dynamic text rendering.
-- **Unity Test Framework (`com.unity.test-framework`)**: NUnit-based unit and integration test suite.
-- **UGUI (`com.unity.ugui`)**: Runtime canvas and UI system.
-
----
-
-## 4. How to Open the Project in Unity Hub
-
-1. Ensure **Unity Hub** is installed on your computer.
-2. Install **Unity 2022.3 LTS** (or Unity 6 LTS) with the **Android Build Support** module (including Android SDK & NDK tools and OpenJDK).
-3. Open Unity Hub, click **Add** > **Add project from disk**.
-4. Select the repository root folder (`indianbike`).
-5. Open the project. Unity will import assets, resolve packages from `Packages/manifest.json`, and compile the `IndianBikeLife.Core` assembly definition.
-
----
-
-## 5. How to Run the Initial Scenes
-
-The scenes are registered in `EditorBuildSettings.asset` in the following order:
+Configured in `EditorBuildSettings.asset`:
 
 ```
-[0] Assets/Scenes/Boot.unity
-[1] Assets/Scenes/Loading.unity
-[2] Assets/Scenes/MainMenu.unity
-```
-
-### Running from Boot (Standard Flow):
-1. In the Unity Project window, navigate to `Assets/Scenes/Boot.unity` and double-click to open it.
-2. Press **Play** in the Unity Editor.
-3. The `GameBootstrapper` executes at high priority (`executionOrder: -1000`):
-   - Initializes `GameLogger`, registers all 7 services in `ServiceLocator`.
-   - Initializes `SaveManager`, loads local profile and settings.
-   - Applies mobile frame rate (`Application.targetFrameRate = 60`) and URP graphics preset.
-   - Automatically transitions to `Loading.unity`.
-4. `Loading.unity` displays the loading bar, progress percentage, and Indian riding tips.
-5. Upon progress completion, `Loading.unity` smoothly transitions into `MainMenu.unity`.
-6. `MainMenu.unity` displays the interactive **Stage 1 Development Dashboard**, featuring live audio volume controls, graphics preset toggle (Low 30 FPS, Medium 60 FPS, High 60 FPS), save data persistence tests, and live performance metrics.
-
----
-
-## 6. Directory Structure Overview
-
-```
-Assets/
-├── Art/                        # Models, Materials, Textures, Animations
-├── Game/
-│   ├── Audio/                  # Audio channels, sound cues, source pools
-│   ├── Configuration/          # ScriptableObject configuration assets
-│   ├── Core/
-│   │   ├── Bootstrapping/      # Application entry point (GameBootstrapper)
-│   │   ├── Services/           # Decoupled ServiceLocator
-│   │   └── State/              # GameState enum & lifecycle
-│   ├── Events/
-│   │   ├── Core/               # Strongly-typed C# EventBus
-│   │   ├── GameEvents/         # Domain event structs
-│   │   └── ScriptableEvents/   # Inspector-friendly GameEvents & Listeners
-│   ├── Input/                  # Decoupled motorcycle input contracts
-│   ├── Interfaces/             # Contracts for all services & saveables
-│   ├── Managers/               # Core managers (Game, Scene, Save, Audio, Input, Perf)
-│   ├── SaveSystem/             # Schema-versioned save system & atomic storage
-│   ├── SceneManagement/        # Asynchronous loading & additive streaming
-│   ├── UI/                     # Loading UI & Development Dashboard
-│   └── IndianBikeLife.Core.asmdef
-├── Prefabs/                    # Core & UI prefabs
-├── Resources/Configurations/   # Default configuration assets
-├── Scenes/                     # Boot, Loading, MainMenu scenes
-├── Settings/URP/               # Universal Render Pipeline settings
-└── Tests/                      # Automated NUnit test suite (EventBus, Save, Config)
+[0] Assets/Scenes/Boot.unity              - Engine Bootstrap & Service Registration
+[1] Assets/Scenes/Loading.unity           - Asynchronous Loading Screen & Indian Riding Tips
+[2] Assets/Scenes/MainMenu.unity          - Stage 1 Development & Audio/Save Dashboard
+[3] Assets/Scenes/RegionalRideTest.unity  - Stage 2 Playable Regional Riding Environment
 ```
 
 ---
 
-## 7. Next Steps: Stage 2 Readiness
+## 4. How to Open and Run the Project
 
-Stage 1 is complete, verified, and ready. Future development can begin on **Stage 2: Motorcycle Physics, Showroom & Controls** without modifying or refactoring any core systems.
+1. Open **Unity Hub** and select **Add > Add project from disk**.
+2. Select the repository root folder (`indianbike`).
+3. Open with **Unity 2022.3 LTS** with Android Build Support installed.
+4. **Running the Regional Test Scene (Stage 2)**:
+   - In Unity Project view, open `Assets/Scenes/RegionalRideTest.unity`.
+   - Press **Play**.
+   - Use the on-screen **Stage 2 System Controls** panel:
+     - **Mount / Dismount Passenger**: Observe procedural leaning into turns and seat positioning.
+     - **Camera Angle**: Toggle between Driver POV, Passenger-focused, Third-Person Chase, and Cinematic views.
+     - **Weather Conditions**: Switch between Sunny, Heavy Rain, and Fog; notice wet road friction response.
+     - **Time of Day**: Switch between Morning, Noon, Sunset, and Night; observe sun angles and streetlights turning on.
+     - **Traffic Density**: Toggle Low, Medium, and High traffic.
+     - **Navigation Route**: Activate turn-by-turn guidance to Ooty Hill Ghat.
+5. **Running from Boot (Full Flow)**:
+   - Open `Assets/Scenes/Boot.unity` and press **Play**. The game will bootstrap services, load save profiles, display the loading screen, and advance to `MainMenu`.
+
+---
+
+## 5. Running Automated Tests
+
+1. In the Unity Editor menu, select **Window > General > Test Runner**.
+2. Under the **EditMode** tab, click **Run All**.
+3. All 10 test suites covering EventBus, SaveSystem, ServiceLocator, Configuration, PassengerSystem, MapSystem, RoadSystem, Navigation, Traffic, and Weather will execute and pass.
+
+Alternatively, execute the Python verification suite:
+```bash
+python3 Tools/Verification/test_stage2_architecture.py
+```

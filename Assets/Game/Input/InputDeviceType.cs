@@ -25,3 +25,4 @@ namespace IndianBikeLife.Core.Input
         LookBack = 6
     }
 }
+

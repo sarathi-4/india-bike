@@ -13,3 +13,4 @@ namespace IndianBikeLife.Core.SceneManagement
         Showroom = 4     // Prepared for motorcycle garage/showroom
     }
 }
+

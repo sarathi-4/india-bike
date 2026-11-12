@@ -150,3 +150,4 @@ namespace IndianBikeLife.Core.UI.Loading
         }
     }
 }
+

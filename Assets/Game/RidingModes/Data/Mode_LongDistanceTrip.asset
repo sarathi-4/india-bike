@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c6d3bc89115b9c0ba9e02c525f2ee3, type: 3}
+  m_Name: Long-Distance Trip
+  _modeType: 4
+  _modeTitle: Long-Distance Trip
+  _description: Multi-city highway tour with checkpoints
+  _theme: 3
+  _surfaceType: 0
+  _trafficDensity: 1
+  _defaultHourOfDay: 7
+  _enableRainByDefault: 0
+  _requiresPassenger: 0
+  _recommendedMotorcycle: Super Meteor 650
+  _isImplementedInStage2: 1
