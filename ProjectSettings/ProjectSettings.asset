@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!129 &1
+PlayerSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 26
+  productGUID: a7b1c3d5e7f9a1b3c5d7e9f1a3b5c7d9
+  AndroidProfiler: 0
+  defaultScreenOrientation: 3
+  targetDevice: 2
+  useOnDemandResources: 0
+  accelerometerFrequency: 60
+  companyName: IndianBikeLife
+  productName: Indian Bike Life
+  defaultCursor: {fileID: 0}
+  cursorHotspot: {x: 0, y: 0}
+  m_SplashScreenBackgroundColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
+  m_ShowUnitySplashScreen: 1
+  m_ShowUnitySplashLogo: 1
+  m_SplashScreenOverlayOpacity: 1
+  m_SplashScreenAnimation: 1
+  m_SplashScreenLogoStyle: 1
+  m_SplashScreenDrawMode: 0
+  m_SplashScreenBackgroundAnimation: 1
+  m_SplashScreenLogoAnimation: 1
+  m_SplashScreenBackgroundLandscape: {fileID: 0}
+  m_SplashScreenBackgroundPortrait: {fileID: 0}
+  m_SplashScreenLogos: []
+  m_VirtualRealitySplashScreen: {fileID: 0}
+  m_HolographicTrackingLossScreen: {fileID: 0}
+  defaultScreenWidth: 1920
+  defaultScreenHeight: 1080
+  defaultScreenWidthWeb: 960
+  defaultScreenHeightWeb: 600
+  m_StereoRenderingPath: 0
+  m_ActiveColorSpace: 1
+  m_MTRendering: 1
+  m_MobileMTRendering: 1
+  m_SupportedAspectRatios:
+    4:3: 1
+    5:4: 1
+    16:10: 1
+    16:9: 1
+    Others: 1
+  bundleVersion: 0.1.0
+  preloadedAssets: []
+  metroInputMedium: 0
+  m_XboxOneResolution: 0
+  autoGraphicsAPIs: 1
+  m_StripEngineCode: 1
+  iPhoneApplicationDisplayName: Indian Bike Life
+  cameraUsageDescription: 
+  locationUsageDescription: 
+  microphoneUsageDescription: 
+  switchResolutionWaitTimeout: 60
+  useRootGov: 0
+  actionOnDisableManagedDebugger: 0
+  assemblyVersionValidation: 1
+  resolutionDialogBanner: {fileID: 0}
+  m_BuildTargetIcons: []
+  m_BuildTargetPlatformIcons: []
+  m_BuildTargetBatching: []
+  m_BuildTargetGraphicsJobs: []
+  m_BuildTargetGraphicsJobMode: []
+  m_BuildTargetGraphicsAPIs: []
+  m_BuildTargetShaderCacheSettings: []
+  m_BuildTargetShadowCascadeSettings: []
+  m_BuildTargetPrebakeCollisionMesh: []
+  m_BuildTargetEnablePreload: []
+  m_BuildTargetDisableHWMul: []
+  m_BuildTargetGpuSkinning: []
+  m_BuildTargetEnableDynamicBatching: []
+  m_BuildTargetEnableInstancing: []
+  m_BuildTargetDynamicInstancingThreshold: []
+  m_BuildTargetStaticBatching: []
+  m_BuildTargetAutoGraphicsAPIs: []
+  m_BuildTargetDisableDepthBuffer: []
+  m_BuildTargetGraphicsJobsMinBatchCount: []
+  m_BuildTargetGraphicsJobsMode: []
+  openGLRequireES31: 0
+  openGLRequireES31AEP: 0
+  openGLRequireES32: 0
+  m_TemplateDependencies: []
+  m_ScriptingBackend:
+    Android: 1
+  m_ScriptingDefineSymbols:
+    Android: URP_PRESENT;INPUT_SYSTEM_PRESENT
+    Standalone: URP_PRESENT;INPUT_SYSTEM_PRESENT
+  m_ScriptingCompilerOptions: {}
+  m_TargetArchitectures:
+    Android: 3
+  m_StrippingLevel: 2
+  m_SpritePackerMode: 0
+  applicationIdentifier:
+    Android: com.indianbikelife.game
+  buildNumber:
+    Android: 1
+  AndroidMinSDKVersion: 26
+  AndroidTargetSDKVersion: 34
+  AndroidPreferredInstallLocation: 1
+  androidShowActivityIndicatorOnLoading: 1
+  androidUseLowAccuracyLocation: 0
+  androidUseAPKExpansionFiles: 0
+  androidIsGame: 1
+  androidKeyStore: 0
+  androidKeyStoreName: 
+  androidKeyStorePassword: 
+  androidKeyAliasName: 
+  androidKeyAliasPassword: 
+  androidForceInternetPermission: 0
+  androidForceSDCardPermission: 0
+  androidTargetArchitectures: 3
+  androidBuildApkPerCpuArchitecture: 0
+  androidScreenOrientation: 3
+  defaultIsFullScreen: 1
+  defaultIsNativeResolution: 1
+  runInBackground: 0
+  captureSingleScreen: 0
+  usePlayerLog: 1
+  preloadShaders: 1
+  bakeCollisionMeshes: 0
+  forceSingleInstance: 0
+  useFlipModelSwapchain: 1
+  resizableWindow: 0
+  useMacAppStoreValidation: 0
+  macAppStoreCategory: public.app-category.games
+  gpuSkinning: 1
+  graphicsJobs: 1
+  xboxServerTitleId: 
+  xboxTitleId: 
+  xboxImageXexFilePath: 
+  xboxSpaFilePath: 
+  xboxGenerateSpa: 0
+  vulkanEnableValidationLayers: 0
+  vulkanEnableSRGB: 1
+  enableUltraHighPerformanceMode: 0
+  mobileMTRendering: 1
+  m_AllowedAutorotateToPortrait: 0
+  m_AllowedAutorotateToPortraitUpsideDown: 0
+  m_AllowedAutorotateToLandscapeRight: 1
+  m_AllowedAutorotateToLandscapeLeft: 1
+  m_useCustomPixelRatio: 0
+  m_customPixelRatio: 1
+  targetPixelDensity: 30
+  activeInputHandler: 2
