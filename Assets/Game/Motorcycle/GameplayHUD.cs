@@ -126,7 +126,7 @@ namespace IndianBikeLife.Motorcycle
             {
                 if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null)
                 {
-                    IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen = true;
+                    IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.OpenMenu();
                 }
             }
 

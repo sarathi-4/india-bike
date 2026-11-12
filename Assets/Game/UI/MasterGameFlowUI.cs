@@ -43,11 +43,26 @@ namespace IndianBikeLife.Core.UI
 
         [Header("Active Screen State")]
         public GameFlowScreen CurrentScreen = GameFlowScreen.SplashAndLoading;
-        public bool IsMenuOpen => CurrentScreen != GameFlowScreen.InGameRiding;
+
+        public bool IsMenuOpen
+        {
+            get => CurrentScreen != GameFlowScreen.InGameRiding;
+            set => CurrentScreen = value ? GameFlowScreen.MainMenuGarage : GameFlowScreen.InGameRiding;
+        }
+
+        public void OpenMenu(GameFlowScreen screen = GameFlowScreen.MainMenuGarage)
+        {
+            CurrentScreen = screen;
+        }
+
+        public void CloseMenuToRiding()
+        {
+            CurrentScreen = GameFlowScreen.InGameRiding;
+        }
 
         // Loading animation state
         private float _loadingProgress = 0f;
-        private bool _isLoadingComplete = false;
+        public bool IsLoadingComplete { get; private set; }
         private string _loadingStatusText = "LOADING ASSETS & SHADERS...";
 
         // Authentication state
@@ -148,6 +163,7 @@ namespace IndianBikeLife.Core.UI
         // Passenger selection
         private bool _isCoupleRiding = false;
         private bool _passengerHelmet = true;
+        public bool PassengerHelmet => _passengerHelmet;
 
         // Player Stats (matching Screenshots 3 & 7)
         private float _distanceRiddenKm = 8.84f;
@@ -219,7 +235,7 @@ namespace IndianBikeLife.Core.UI
 
             _loadingProgress = 1.0f;
             _loadingStatusText = "READY TO RIDE!";
-            _isLoadingComplete = true;
+            IsLoadingComplete = true;
             yield return new WaitForSeconds(0.3f);
 
             CurrentScreen = GameFlowScreen.TermsWelcome;
