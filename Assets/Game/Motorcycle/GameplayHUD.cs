@@ -100,8 +100,8 @@ namespace IndianBikeLife.Motorcycle
             GUI.Label(new Rect(10, 8, w - 20, 38), "🏍️ INDIAN BIKE LIFE  |  📍 NH-44 Express Highway Corridor", locStyle);
 
             // Left Side: Wallet (Silver & Gold Coins)
-            int silver = _economyManager != null ? _economyManager.Wallet.SilverCoins : 1000;
-            int gold = _economyManager != null ? _economyManager.Wallet.GoldCoins : 10;
+            int silver = _economyManager != null ? _economyManager.SilverCoins : 1000;
+            int gold = _economyManager != null ? _economyManager.GoldCoins : 10;
             int level = _progressionManager != null ? _progressionManager.CurrentLevel : 1;
 
             GUIStyle statStyle = new GUIStyle(GUI.skin.label)
@@ -252,3 +252,4 @@ namespace IndianBikeLife.Motorcycle
         }
     }
 }
+

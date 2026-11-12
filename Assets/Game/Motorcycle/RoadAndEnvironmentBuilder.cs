@@ -12,7 +12,6 @@ namespace IndianBikeLife.Motorcycle
         [Header("Highway Dimensions")]
         [SerializeField] private float _roadLength = 2000f;
         [SerializeField] private float _roadWidth = 14f;
-        [SerializeField] private float _segmentLength = 25f;
 
         private Material _asphaltMat;
         private Material _markingWhiteMat;
@@ -251,3 +250,4 @@ namespace IndianBikeLife.Motorcycle
         }
     }
 }
+
