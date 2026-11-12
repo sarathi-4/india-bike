@@ -97,6 +97,17 @@ namespace IndianBikeLife.Motorcycle
             UpdateVisuals();
             UpdateGearsAndRpm();
 
+            // Auto-decay external mobile inputs so buttons don't lock or spin infinitely
+            _externalThrottle = 0f;
+            _externalSteer = Mathf.MoveTowards(_externalSteer, 0f, Time.deltaTime * 8f);
+            _externalBrake = 0f;
+
+            // R key respawns motorcycle back upright on road
+            if (Input.GetKeyDown(KeyCode.R) || transform.position.y < -5f)
+            {
+                RespawnOnRoad();
+            }
+
             if (horn)
             {
                 OnHornHonked?.Invoke();
@@ -206,22 +217,44 @@ namespace IndianBikeLife.Motorcycle
         {
             // Speed-adaptive steering sensitivity: high speed requires smooth gentle turns
             float speedAbs = Mathf.Abs(_currentSpeedKmh);
-            float steerFactor = Mathf.Lerp(1.2f, 0.45f, Mathf.Clamp01(speedAbs / 100f));
+            float steerFactor = Mathf.Lerp(1.0f, 0.35f, Mathf.Clamp01(speedAbs / 90f));
             float targetSteerAngle = steerInput * _steerSensitivity * steerFactor;
 
-            _currentSteerAngle = Mathf.Lerp(_currentSteerAngle, targetSteerAngle, Time.deltaTime * 12f);
+            _currentSteerAngle = Mathf.Lerp(_currentSteerAngle, targetSteerAngle, Time.deltaTime * 14f);
 
-            // Turn motorcycle yaw when moving
-            if (speedAbs > 0.5f)
+            // Turn motorcycle yaw smoothly only when moving with realistic turning radius
+            if (speedAbs > 0.4f)
             {
                 float turnDir = Mathf.Sign(_currentSpeedKmh);
-                float turnAngle = _currentSteerAngle * turnDir * (speedAbs / 60f) * Time.deltaTime * 35f;
-                transform.Rotate(0f, turnAngle, 0f);
+                float speedWeight = Mathf.Clamp(speedAbs / 45f, 0.25f, 1.1f);
+                float maxTurnPerSec = 75f; // Clamped maximum turn rate prevents wild 360 spinning
+                float rawTurn = _currentSteerAngle * turnDir * speedWeight * Time.deltaTime * 28f;
+                float clampedTurn = Mathf.Clamp(rawTurn, -maxTurnPerSec * Time.deltaTime, maxTurnPerSec * Time.deltaTime);
+                transform.Rotate(0f, clampedTurn, 0f);
             }
 
             // Calculate dynamic motorcycle cornering lean
-            float targetLean = -steerInput * _maxLeanAngle * Mathf.Clamp01(speedAbs / 40f);
+            float targetLean = -steerInput * _maxLeanAngle * Mathf.Clamp01(speedAbs / 35f);
             _currentLeanAngle = Mathf.Lerp(_currentLeanAngle, targetLean, Time.deltaTime * _leanSmoothing);
+        }
+
+        public void RespawnOnRoad()
+        {
+            _currentSpeedKmh = 0f;
+            _verticalVelocity = 0f;
+            _currentSteerAngle = 0f;
+            _currentLeanAngle = 0f;
+            _externalSteer = 0f;
+            _externalThrottle = 0f;
+            _externalBrake = 0f;
+
+            // Re-align upright facing along forward road direction
+            Vector3 currentEuler = transform.eulerAngles;
+            transform.eulerAngles = new Vector3(0f, currentEuler.y, 0f);
+
+            // Snap onto road surface
+            Vector3 p = transform.position;
+            transform.position = new Vector3(Mathf.Clamp(p.x, -5f, 5f), 0.65f, p.z);
         }
 
         private void UpdateMotion()

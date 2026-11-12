@@ -25,7 +25,8 @@ namespace IndianBikeLife.Core.UI
         Missions = 6,           // 6. Missions
         Multiplayer = 7,        // 7. Multiplayer
         Settings = 8,           // 8. Settings
-        RewardScreen = 9        // 9. Reward Screen
+        RewardScreen = 9,       // 9. Reward Screen
+        AvatarStudio = 10       // 10. Rider Avatar Customization Studio
     }
 
     /// <summary>
@@ -120,9 +121,35 @@ namespace IndianBikeLife.Core.UI
         private bool _mission2Claimed = false;
         private bool _mission3Claimed = false;
 
-        // 7. Multiplayer State
-        private string _roomCodeInput = "TN44BK";
+        // 7. Multiplayer & Social Invite State
+        private string _roomCodeInput = "TN-44-ROYAL";
+        private string _myGeneratedRoomCode = "TN-44-ROYAL";
         private string _multiplayerStatus = "Ready to connect to Indian Highway Convoy.";
+        private bool _isRoomCodeCopied = false;
+        private readonly string[] _convoyFriends = new[] { "Arun_Rider99 (Online)", "Kavitha_Bullet (Online)", "Siva_Duke390 (In-Ride)", "Vijay_Pulsar (Online)" };
+
+        // 10. Avatar Customization State
+        private bool _isFemaleAvatar = false;
+        private int _selectedJacketIdx = 0;
+        private readonly string[] _jacketNames = new[] { "Dark Leather", "Racing Red", "Royal Navy", "Desert Tan", "KTM Neon" };
+        private readonly Color[] _jacketColors = new[]
+        {
+            new Color(0.14f, 0.18f, 0.24f),
+            new Color(0.85f, 0.15f, 0.18f),
+            new Color(0.12f, 0.35f, 0.82f),
+            new Color(0.55f, 0.40f, 0.25f),
+            new Color(1.00f, 0.45f, 0.05f)
+        };
+        private int _selectedHelmetIdx = 0;
+        private readonly string[] _helmetColorNames = new[] { "Saffron Yellow", "Gloss White", "Matte Black", "Racer Red" };
+        private readonly Color[] _helmetColors = new[]
+        {
+            new Color(1.0f, 0.76f, 0.08f),
+            new Color(0.95f, 0.95f, 0.98f),
+            new Color(0.12f, 0.12f, 0.15f),
+            new Color(0.85f, 0.15f, 0.18f)
+        };
+        private int _selectedHelmetStyle = 0; // 0=Full Face, 1=Classic Open Face, 2=Motocross Visor
 
         // 8. Settings State
         private int _settingsTab = 0; // 0=Graphics, 1=Audio, 2=Controls, 3=Language, 4=Account
@@ -309,6 +336,10 @@ namespace IndianBikeLife.Core.UI
                 case GameScreen.RewardScreen:
                     DrawScreen9_RewardScreen(w, h);
                     break;
+
+                case GameScreen.AvatarStudio:
+                    DrawScreen10_AvatarStudio(w, h);
+                    break;
             }
         }
 
@@ -430,15 +461,21 @@ namespace IndianBikeLife.Core.UI
 
             // Bottom-Left Buttons: PROFILE & ACHIEVEMENTS (Reference 2)
             float bottomY = h - 55f;
-            GUI.DrawTexture(new Rect(20, bottomY, 130, 38), _darkPanelTex);
-            if (GUI.Button(new Rect(20, bottomY, 130, 38), "👤 PROFILE"))
+            GUI.DrawTexture(new Rect(20, bottomY, 120, 38), _darkPanelTex);
+            if (GUI.Button(new Rect(20, bottomY, 120, 38), "👤 PROFILE"))
             {
                 CurrentScreen = GameScreen.Settings;
                 _settingsTab = 4; // Account/Profile
             }
 
-            GUI.DrawTexture(new Rect(160, bottomY, 160, 38), _darkPanelTex);
-            if (GUI.Button(new Rect(160, bottomY, 160, 38), "⭐ ACHIEVEMENTS"))
+            GUI.DrawTexture(new Rect(148, bottomY, 140, 38), _darkPanelTex);
+            if (GUI.Button(new Rect(148, bottomY, 140, 38), "🎨 AVATAR"))
+            {
+                CurrentScreen = GameScreen.AvatarStudio;
+            }
+
+            GUI.DrawTexture(new Rect(296, bottomY, 150, 38), _darkPanelTex);
+            if (GUI.Button(new Rect(296, bottomY, 150, 38), "⭐ ACHIEVEMENTS"))
             {
                 CurrentScreen = GameScreen.RewardScreen;
             }
@@ -494,20 +531,28 @@ namespace IndianBikeLife.Core.UI
                 }
             }
 
-            GUILayout.Space(8);
-            // Blue CUSTOMIZE Button
+            GUILayout.Space(6);
+            // Blue CUSTOMIZE COLOR Button
             GUI.backgroundColor = new Color(0.12f, 0.50f, 0.98f);
-            GUIStyle custStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 14 };
-            if (GUILayout.Button("CUSTOMIZE COLOR", custStyle, GUILayout.Height(36)))
+            GUIStyle custStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 13 };
+            if (GUILayout.Button("🎨 BIKE COLOR", custStyle, GUILayout.Height(32)))
             {
                 _selectedColorIndex = (_selectedColorIndex + 1) % _bikeColors.Length;
                 ApplyCustomizationsToBike();
             }
 
-            GUILayout.Space(6);
+            GUILayout.Space(4);
+            // Orange AVATAR STUDIO Button
+            GUI.backgroundColor = new Color(1.0f, 0.55f, 0.12f);
+            if (GUILayout.Button("👤 RIDER AVATAR", custStyle, GUILayout.Height(32)))
+            {
+                CurrentScreen = GameScreen.AvatarStudio;
+            }
+
+            GUILayout.Space(4);
             // Passenger Toggle (Couple Riding)
             GUI.backgroundColor = _isCoupleRiding ? new Color(0.85f, 0.35f, 0.65f) : new Color(0.35f, 0.45f, 0.60f);
-            if (GUILayout.Button(_isCoupleRiding ? "👥 COUPLE: ON" : "👤 SOLO RIDER", GUILayout.Height(32)))
+            if (GUILayout.Button(_isCoupleRiding ? "👥 COUPLE: ON" : "👤 SOLO RIDER", GUILayout.Height(30)))
             {
                 _isCoupleRiding = !_isCoupleRiding;
                 ApplyCustomizationsToBike();
@@ -626,6 +671,8 @@ namespace IndianBikeLife.Core.UI
                 if (GUI.Button(new Rect(sx, sy, colW, 38), $"📍 {_stateNames[s]}", sBtn))
                 {
                     _selectedStateIndex = s;
+                    var roadGen = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
+                    roadGen?.LoadStateEnvironment(_selectedStateIndex);
                 }
             }
             GUI.backgroundColor = Color.white;
@@ -676,6 +723,13 @@ namespace IndianBikeLife.Core.UI
 
             if (GUILayout.Button("SELECT STATE ▶", selStyle, GUILayout.Height(50)))
             {
+                var roadGen = FindFirstObjectByType<RoadAndEnvironmentBuilder>();
+                roadGen?.LoadStateEnvironment(_selectedStateIndex);
+                if (_motorcycle != null)
+                {
+                    _motorcycle.RespawnOnRoad();
+                }
+                ApplyCustomizationsToBike();
                 CurrentScreen = GameScreen.RidingHUD;
             }
             GUI.backgroundColor = Color.white;
@@ -762,12 +816,27 @@ namespace IndianBikeLife.Core.UI
             float steerY = h - 90f;
             if (GUI.RepeatButton(new Rect(30, steerY, 70, 70), "◀"))
             {
-                _motorcycle?.SetSteerInput(-1f);
+                _motorcycle?.SetSteerInput(-0.85f);
             }
             if (GUI.RepeatButton(new Rect(115, steerY, 70, 70), "▶"))
             {
-                _motorcycle?.SetSteerInput(1f);
+                _motorcycle?.SetSteerInput(0.85f);
             }
+
+            // Center Upright Re-center Button & 360-degree look hint
+            if (GUI.Button(new Rect(w * 0.5f - 60f, h - 45f, 120f, 32f), "🔄 RE-CENTER"))
+            {
+                _motorcycle?.RespawnOnRoad();
+            }
+
+            GUIStyle hintStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 11,
+                fontStyle = FontStyle.Bold
+            };
+            hintStyle.normal.textColor = new Color(1f, 1f, 1f, 0.70f);
+            GUI.Label(new Rect(w * 0.5f - 150f, h - 72f, 300f, 22f), "👆 Swipe / Drag Screen for 360° View", hintStyle);
 
             // Bottom-Right: Brake Pedal & Gas Throttle Pedal (Reference 5)
             float pedalY = h - 100f;
@@ -944,8 +1013,8 @@ namespace IndianBikeLife.Core.UI
             // 3 Bottom Feature Cards (Reference 7: Online Ride, Create Room, Join Room)
             float cardSpacing = 20f;
             float cardW = (w - 50f - cardSpacing * 2) / 3f;
-            float cardH = Mathf.Min(220f, h * 0.48f);
-            float cardY = h - cardH - 30f;
+            float cardH = Mathf.Min(220f, h * 0.44f);
+            float cardY = h - cardH - 85f;
 
             // Card 1: Online Ride
             DrawMultiplayerCard(25, cardY, cardW, cardH, "🌐", "Online Ride", "Instant Matchmaking\nNH-44 Express Convoy", "Join Now", () =>
@@ -954,18 +1023,53 @@ namespace IndianBikeLife.Core.UI
                 CurrentScreen = GameScreen.RidingHUD;
             });
 
-            // Card 2: Create Room
-            DrawMultiplayerCard(25 + cardW + cardSpacing, cardY, cardW, cardH, "👥", "Create Room", "Host Private 4-Player\nHighway Tour", "Create", () =>
+            // Card 2: Create Room & Invite
+            DrawMultiplayerCard(25 + cardW + cardSpacing, cardY, cardW, cardH, "👥", "Create Room", $"Host Private 4-Player Convoy\nRoom: {_myGeneratedRoomCode}", "Host & Invite", () =>
             {
-                _multiplayerStatus = "Created Room TN44BK. Waiting for riders...";
+                _multiplayerStatus = $"Created Room {_myGeneratedRoomCode}! Code copied to clipboard.";
+                GUIUtility.systemCopyBuffer = _myGeneratedRoomCode;
+                _isRoomCodeCopied = true;
             });
 
             // Card 3: Join Room
-            DrawMultiplayerCard(25 + (cardW + cardSpacing) * 2, cardY, cardW, cardH, "🚪", "Join Room", "Enter 6-character\nRoom Invite Code", "Enter", () =>
+            DrawMultiplayerCard(25 + (cardW + cardSpacing) * 2, cardY, cardW, cardH, "🚪", "Join Room", "Enter Room Invite Code\nbelow to join friends", "Join Room", () =>
             {
-                _multiplayerStatus = "Joined Room " + _roomCodeInput + "!";
+                _multiplayerStatus = "Joined Convoy Room " + _roomCodeInput + "!";
                 CurrentScreen = GameScreen.RidingHUD;
             });
+
+            // Bottom Social Friends & Room Code Invite Bar
+            float barY = h - 70f;
+            GUI.DrawTexture(new Rect(25, barY, w - 50f, 55f), _darkPanelTex);
+
+            GUIStyle invStyle = new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold };
+            invStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(35, barY + 8, 220, 20), $"Invite Code: <b>{_myGeneratedRoomCode}</b>", invStyle);
+
+            if (GUI.Button(new Rect(35, barY + 28, 140, 24), _isRoomCodeCopied ? "✓ CODE COPIED!" : "📋 COPY INVITE CODE"))
+            {
+                GUIUtility.systemCopyBuffer = _myGeneratedRoomCode;
+                _isRoomCodeCopied = true;
+                _multiplayerStatus = $"Room code {_myGeneratedRoomCode} copied! Share with friends to ride together.";
+            }
+
+            // Quick Friend Invites
+            GUI.Label(new Rect(210, barY + 8, 120, 20), "Online Friends:", invStyle);
+            float fx = 320f;
+            for (int f = 0; f < _convoyFriends.Length; f++)
+            {
+                if (fx + 140f > w - 180f) break;
+                if (GUI.Button(new Rect(fx, barY + 12, 135, 30), $"+ {_convoyFriends[f]}"))
+                {
+                    _multiplayerStatus = $"Invited {_convoyFriends[f]} to convoy {_myGeneratedRoomCode}!";
+                }
+                fx += 145f;
+            }
+
+            // Room Code Input on Right
+            float inX = w - 190f;
+            GUI.Label(new Rect(inX, barY + 6, 120, 18), "Enter Room Code:", invStyle);
+            _roomCodeInput = GUI.TextField(new Rect(inX, barY + 26, 155, 24), _roomCodeInput);
 
             // Status message
             GUIStyle statStyle = new GUIStyle(GUI.skin.label)
@@ -975,7 +1079,7 @@ namespace IndianBikeLife.Core.UI
                 fontStyle = FontStyle.Bold
             };
             statStyle.normal.textColor = new Color(1f, 0.85f, 0.2f);
-            GUI.Label(new Rect(0, cardY - 35, w, 25), _multiplayerStatus, statStyle);
+            GUI.Label(new Rect(0, cardY - 32, w, 24), _multiplayerStatus, statStyle);
         }
 
         private void DrawMultiplayerCard(float x, float y, float w, float h, string icon, string title, string desc, string btnText, Action onAction)
@@ -1365,6 +1469,112 @@ namespace IndianBikeLife.Core.UI
             }
         }
 
+        // =========================================================================
+        // SCREEN 10: AVATAR & RIDER STUDIO
+        // =========================================================================
+        private void DrawScreen10_AvatarStudio(int w, int h)
+        {
+            DrawScreenTag("10. Rider Avatar Studio");
+            DrawHeaderBar(w, "RIDER AVATAR & ATTIRE", () => CurrentScreen = GameScreen.Garage);
+            DrawTopWallet(w);
+
+            float panelW = Mathf.Min(340f, w * 0.38f);
+            float panelX = w - panelW - 25f;
+            float panelY = 70f;
+            float panelH = h - panelY - 30f;
+
+            GUI.DrawTexture(new Rect(panelX, panelY, panelW, panelH), _darkPanelTex);
+            GUILayout.BeginArea(new Rect(panelX + 16, panelY + 16, panelW - 32, panelH - 32));
+
+            GUIStyle titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold };
+            titleStyle.normal.textColor = new Color(1f, 0.78f, 0.12f);
+            GUILayout.Label("👤 RIDER CUSTOMIZATION", titleStyle);
+            GUILayout.Space(10);
+
+            // Gender Selection
+            GUILayout.Label("<b>Rider Character Gender:</b>");
+            GUILayout.BeginHorizontal();
+            GUI.backgroundColor = !_isFemaleAvatar ? new Color(1f, 0.76f, 0.08f) : Color.gray;
+            if (GUILayout.Button("👨 MALE RIDER", GUILayout.Height(34)))
+            {
+                _isFemaleAvatar = false;
+                ApplyCustomizationsToBike();
+            }
+            GUI.backgroundColor = _isFemaleAvatar ? new Color(1f, 0.76f, 0.08f) : Color.gray;
+            if (GUILayout.Button("👩 FEMALE RIDER", GUILayout.Height(34)))
+            {
+                _isFemaleAvatar = true;
+                ApplyCustomizationsToBike();
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(12);
+
+            // Jacket Color Selection
+            GUILayout.Label("<b>Leather Riding Jacket:</b>");
+            for (int j = 0; j < _jacketNames.Length; j++)
+            {
+                bool isSel = (_selectedJacketIdx == j);
+                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
+                if (GUILayout.Button($"🧥 {_jacketNames[j]}", GUILayout.Height(28)))
+                {
+                    _selectedJacketIdx = j;
+                    ApplyCustomizationsToBike();
+                }
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.Space(12);
+
+            // Helmet Style Selection
+            GUILayout.Label("<b>Helmet Selection:</b>");
+            string[] styles = { "🪖 Full-Face Sport", "🪖 Classic Retro Open", "🪖 Motocross Peak Visor" };
+            for (int hs = 0; hs < styles.Length; hs++)
+            {
+                bool isSel = (_selectedHelmetStyle == hs);
+                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
+                if (GUILayout.Button(styles[hs], GUILayout.Height(28)))
+                {
+                    _selectedHelmetStyle = hs;
+                    ApplyCustomizationsToBike();
+                }
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.Space(12);
+
+            // Helmet Color Selection
+            GUILayout.Label("<b>Helmet Color:</b>");
+            GUILayout.BeginHorizontal();
+            for (int hc = 0; hc < _helmetColorNames.Length; hc++)
+            {
+                bool isSel = (_selectedHelmetIdx == hc);
+                GUI.backgroundColor = isSel ? new Color(1f, 0.76f, 0.08f) : Color.gray;
+                if (GUILayout.Button(_helmetColorNames[hc], GUILayout.Height(28)))
+                {
+                    _selectedHelmetIdx = hc;
+                    ApplyCustomizationsToBike();
+                }
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+
+            GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = new Color(1f, 0.76f, 0.08f);
+            GUIStyle saveStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fontSize = 15 };
+            saveStyle.normal.textColor = Color.black;
+            if (GUILayout.Button("SAVE & RETURN ▶", saveStyle, GUILayout.Height(42)))
+            {
+                ApplyCustomizationsToBike();
+                CurrentScreen = GameScreen.Garage;
+            }
+            GUI.backgroundColor = Color.white;
+
+            GUILayout.EndArea();
+        }
+
         private void ApplyCustomizationsToBike()
         {
             if (_motorcycle == null || _visualBuilder == null)
@@ -1374,8 +1584,13 @@ namespace IndianBikeLife.Core.UI
 
             if (_visualBuilder != null)
             {
+                if (_visualBuilder.CurrentModelIndex != _selectedBikeIndex)
+                {
+                    _visualBuilder.BuildMotorcycleModel(_selectedBikeIndex);
+                }
                 _visualBuilder.SetBodyPaintColor(_bikeColors[_selectedColorIndex]);
                 _visualBuilder.SetPassengerVisible(_isCoupleRiding);
+                _visualBuilder.SetRiderAvatar(_isFemaleAvatar, _jacketColors[_selectedJacketIdx], _helmetColors[_selectedHelmetIdx], _selectedHelmetStyle);
             }
 
             if (_motorcycle != null)
