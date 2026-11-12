@@ -34,6 +34,11 @@ namespace IndianBikeLife.Motorcycle
         private Vector3 _lastPointerPos;
         private bool _isDraggingOrbit = false;
 
+        private PlayerMotorcycleController _controller;
+        private Camera _camera;
+        private float _baseFov = 60f;
+        private bool _isLookingBack = false;
+
         public void SetOrbitAngles(float yaw, float pitch)
         {
             _orbitYaw = yaw;
