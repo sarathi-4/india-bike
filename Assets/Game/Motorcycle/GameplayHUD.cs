@@ -67,9 +67,9 @@ namespace IndianBikeLife.Motorcycle
 
         private void OnGUI()
         {
-            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null && IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen)
+            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null)
             {
-                return; // Hide HUD controls while Menu is open
+                return; // MasterGameFlowUI renders the unified 9-screen AAA UI
             }
 
             int w = Screen.width;
