@@ -243,6 +243,16 @@ namespace IndianBikeLife.Motorcycle
             if (_passengerVisual != null) _passengerVisual.SetActive(visible);
         }
 
+        public void SetBodyPaintColor(Color color)
+        {
+            _bodyPaintColor = color;
+            if (_bodyMat != null)
+            {
+                if (_bodyMat.HasProperty("_BaseColor")) _bodyMat.SetColor("_BaseColor", color);
+                if (_bodyMat.HasProperty("_Color")) _bodyMat.SetColor("_Color", color);
+            }
+        }
+
         private GameObject CreatePrimitive(PrimitiveType type, string name, Transform parent, Vector3 localPos, Vector3 localScale, Material mat)
         {
             GameObject obj = GameObject.CreatePrimitive(type);

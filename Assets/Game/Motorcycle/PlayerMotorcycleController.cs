@@ -298,6 +298,17 @@ namespace IndianBikeLife.Motorcycle
         public void SetNitroInput(bool val) => _externalNitro = val;
         public void TriggerHorn() => _externalHorn = true;
 
+        private string _currentBikeModelName = "Royal Enfield Classic 350";
+        public string CurrentBikeModelName => _currentBikeModelName;
+
+        public void ApplyBikeTuning(string modelName, float topSpeed, float acceleration, float brakePower)
+        {
+            _currentBikeModelName = modelName;
+            _topSpeedKmh = topSpeed;
+            _accelerationRate = acceleration;
+            _brakeForce = brakePower;
+        }
+
         public void BindVisualAnchors(Transform chassis, Transform fork, Transform fWheel, Transform rWheel, Light headlight, Transform seat)
         {
             _visualChassis = chassis;

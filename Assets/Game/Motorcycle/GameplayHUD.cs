@@ -67,6 +67,11 @@ namespace IndianBikeLife.Motorcycle
 
         private void OnGUI()
         {
+            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null && IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen)
+            {
+                return; // Hide HUD controls while Menu is open
+            }
+
             int w = Screen.width;
             int h = Screen.height;
 
@@ -113,9 +118,18 @@ namespace IndianBikeLife.Motorcycle
             statStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(25, 12, 350, 30), $"🪙 Silver: {silver:N0}   💰 Gold: {gold}   ⭐ Lvl: {level}", statStyle);
 
-            // Right Side: Camera View & Passenger Toggle Buttons
+            // Right Side: Menu, Camera View & Passenger Toggle Buttons
             float btnW = 95f;
             float btnH = 28f;
+
+            if (GUI.Button(new Rect(w - btnW * 3 - 45, 13, btnW, btnH), "🏍️ Menu (M)"))
+            {
+                if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null)
+                {
+                    IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen = true;
+                }
+            }
+
             if (GUI.Button(new Rect(w - btnW * 2 - 35, 13, btnW, btnH), "🎥 View (V)"))
             {
                 if (_followCamera != null) _followCamera.ToggleViewMode();

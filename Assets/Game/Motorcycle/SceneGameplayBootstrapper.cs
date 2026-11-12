@@ -114,6 +114,14 @@ namespace IndianBikeLife.Motorcycle
                 gameplayHUD = hudObj.AddComponent<GameplayHUD>();
             }
 
+            // 5. Ensure Master Game Flow Menu (Login, Garage, Map, Passenger, Missions)
+            var masterMenu = FindFirstObjectByType<IndianBikeLife.Core.UI.MasterGameFlowUI>();
+            if (masterMenu == null)
+            {
+                GameObject menuObj = new GameObject("[Master_Game_Flow_UI]");
+                masterMenu = menuObj.AddComponent<IndianBikeLife.Core.UI.MasterGameFlowUI>();
+            }
+
             // Reposition motorcycle properly on top of the road surface
             bikeObj.transform.position = new Vector3(-2.2f, 0.6f, 12f);
             bikeObj.transform.rotation = Quaternion.identity;

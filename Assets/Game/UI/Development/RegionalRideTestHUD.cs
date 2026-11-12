@@ -72,7 +72,12 @@ namespace IndianBikeLife.Core.UI.Development
 
         private void OnGUI()
         {
-            if (GUI.Button(new Rect(15, 52, 110, 26), _showHUD ? "✖ Close Tools" : "🛠️ Debug Tools"))
+            if (IndianBikeLife.Core.UI.MasterGameFlowUI.Instance != null && IndianBikeLife.Core.UI.MasterGameFlowUI.Instance.IsMenuOpen)
+            {
+                return; // Suppress debug HUD while player is in Master Game Flow UI
+            }
+
+            if (GUI.Button(new Rect(15, 88, 110, 26), _showHUD ? "✖ Close Tools" : "🛠️ Debug Tools"))
             {
                 _showHUD = !_showHUD;
             }
